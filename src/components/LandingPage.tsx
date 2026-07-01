@@ -4,9 +4,11 @@ import React from 'react';
 
 interface LandingPageProps {
   onStartAuth: () => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
 }
 
-export default function LandingPage({ onStartAuth }: LandingPageProps) {
+export default function LandingPage({ onStartAuth, theme, onToggleTheme }: LandingPageProps) {
   return (
     <div className="landing-page">
       {/* Header section */}
@@ -18,14 +20,33 @@ export default function LandingPage({ onStartAuth }: LandingPageProps) {
           </svg>
           <h2>Moto<span>Serv</span></h2>
         </div>
-        <button 
-          className="btn btn-secondary btn-sm" 
-          id="btn-landing-login" 
-          onClick={onStartAuth}
-          aria-label="Masuk atau Daftar Akun"
-        >
-          Masuk / Daftar
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            className="btn btn-secondary btn-icon-only" 
+            onClick={onToggleTheme} 
+            title={theme === 'dark' ? "Mode Terang" : "Mode Gelap"}
+            style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Toggle tema tampilan"
+          >
+            {theme === 'dark' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}>
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}>
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+              </svg>
+            )}
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm" 
+            id="btn-landing-login" 
+            onClick={onStartAuth}
+            aria-label="Masuk atau Daftar Akun"
+          >
+            Masuk / Daftar
+          </button>
+        </div>
       </header>
 
       {/* Hero section */}

@@ -48,6 +48,7 @@ export default function Home() {
   const [activeMotorcycleId, setActiveMotorcycleId] = useState<string>('');
   const [logs, setLogs] = useState<ServiceLog[]>([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // Modals state
   const [isAddMotorOpen, setIsAddMotorOpen] = useState(false);
@@ -213,6 +214,23 @@ export default function Home() {
     checkSession();
   }, []);
 
+  // 3a. Read theme configuration on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('motoserv_theme') as 'dark' | 'light';
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  // 3b. Sync theme changes with body class list
+  useEffect(() => {
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+  }, [theme]);
+
   // 4. Fetch database data once user state changes to logged-in
   useEffect(() => {
     if (user) {
@@ -276,6 +294,13 @@ export default function Home() {
       undefined,
       { confirmText: 'Keluar', cancelText: 'Batal', isDanger: true }
     );
+  };
+
+  // 6a. Theme toggler
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('motoserv_theme', newTheme);
   };
 
   // 7. Handle active motorcycle toggle
@@ -719,7 +744,7 @@ export default function Home() {
   if (!user) {
     return (
       <>
-        <LandingPage onStartAuth={() => setIsAuthOpen(true)} />
+        <LandingPage theme={theme} onToggleTheme={toggleTheme} onStartAuth={() => setIsAuthOpen(true)} />
         {isAuthOpen && (
           <div className="modal-backdrop open" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', zIndex: 110 }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '420px' }}>
@@ -771,6 +796,8 @@ export default function Home() {
         onSelectTab={setActiveTab}
         onLogout={handleLogout}
         onOpenAuthModal={() => setIsAuthOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <main className="app-main">

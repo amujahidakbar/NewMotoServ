@@ -44,6 +44,40 @@
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Light Theme Variables Overrides */
+.light-theme {
+    --bg-base: #f1f5f9;
+    --bg-surface: rgba(255, 255, 255, 0.75);
+    --bg-surface-solid: #ffffff;
+    --bg-surface-hover: rgba(241, 245, 249, 0.85);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-color-active: rgba(6, 182, 212, 0.5);
+
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+
+    /* Shadows & Effects */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 25px -4px rgba(0, 0, 0, 0.12);
+    --shadow-glow: 0 0 12px rgba(6, 182, 212, 0.12);
+    --shadow-glow-danger: 0 0 12px rgba(239, 68, 68, 0.12);
+}
+
+.light-theme .form-control {
+    background-color: rgba(15, 23, 42, 0.03);
+}
+
+.light-theme .btn-secondary {
+    background-color: rgba(15, 23, 42, 0.04);
+}
+
+.light-theme .btn-secondary:hover {
+    background-color: rgba(15, 23, 42, 0.08);
+}
+
 /* Base resets & styles */
 *, *::before, *::after {
     box-sizing: border-box;
