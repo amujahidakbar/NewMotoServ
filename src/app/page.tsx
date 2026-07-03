@@ -63,6 +63,7 @@ export default function Home() {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
   const [isAddFuelOpen, setIsAddFuelOpen] = useState(false);
+  const [editingFuelLog, setEditingFuelLog] = useState<FuelLog | null>(null);
 
   // Modals state
   const [isAddMotorOpen, setIsAddMotorOpen] = useState(false);
@@ -721,7 +722,7 @@ export default function Home() {
     );
   };
 
-  // 14a. Add fuel log handler
+  // 14a. Add/Edit fuel log handler
   const handleAddFuelLog = async (fuelData: {
     date: string;
     odometer: number;
@@ -729,48 +730,93 @@ export default function Home() {
     price: number;
   }) => {
     try {
-      if (user) {
-        const res = await fetch('/api/fuel-logs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      if (editingFuelLog) {
+        // EDIT MODE
+        if (user) {
+          // Logged in: Sync with API (PUT)
+          const res = await fetch(`/api/fuel-logs/${editingFuelLog.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fuelData)
+          });
+
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Gagal memperbarui catatan bahan bakar.');
+          }
+
+          await fetchDataFromDB();
+          setEditingFuelLog(null);
+          return true;
+        } else {
+          // Guest user: Save to local storage
+          const updatedLogs = fuelLogs.map(log => {
+            if (log.id === editingFuelLog.id) {
+              return { ...log, ...fuelData };
+            }
+            return log;
+          });
+          setFuelLogs(updatedLogs);
+          localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify(updatedLogs));
+
+          // Automatically update the motorcycle's current odometer if the fuel log's odo is higher
+          const updatedMotors = motorcycles.map(m => {
+            if (m.id === activeMotorcycleId && fuelData.odometer > m.currentOdo) {
+              return { ...m, currentOdo: fuelData.odometer };
+            }
+            return m;
+          });
+
+          setMotorcycles(updatedMotors);
+          localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updatedMotors));
+          setEditingFuelLog(null);
+          return true;
+        }
+      } else {
+        // ADD MODE
+        if (user) {
+          const res = await fetch('/api/fuel-logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              motorcycleId: activeMotorcycleId,
+              ...fuelData
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Gagal menyimpan catatan bahan bakar.');
+          }
+
+          await fetchDataFromDB();
+          return true;
+        } else {
+          const newLog: FuelLog = {
+            id: 'fuel_' + Math.random().toString(36).substring(2, 9),
             motorcycleId: activeMotorcycleId,
             ...fuelData
-          })
-        });
+          };
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Gagal menyimpan catatan bahan bakar.');
+          const updatedLogs = [newLog, ...fuelLogs];
+          setFuelLogs(updatedLogs);
+          localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify(updatedLogs));
+
+          const updatedMotors = motorcycles.map(m => {
+            if (m.id === activeMotorcycleId && fuelData.odometer > m.currentOdo) {
+              return { ...m, currentOdo: fuelData.odometer };
+            }
+            return m;
+          });
+
+          setMotorcycles(updatedMotors);
+          localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updatedMotors));
+          return true;
         }
-
-        await fetchDataFromDB();
-        return true;
-      } else {
-        const newLog: FuelLog = {
-          id: 'fuel_' + Math.random().toString(36).substring(2, 9),
-          motorcycleId: activeMotorcycleId,
-          ...fuelData
-        };
-
-        const updatedLogs = [newLog, ...fuelLogs];
-        setFuelLogs(updatedLogs);
-        localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify(updatedLogs));
-
-        const updatedMotors = motorcycles.map(m => {
-          if (m.id === activeMotorcycleId && fuelData.odometer > m.currentOdo) {
-            return { ...m, currentOdo: fuelData.odometer };
-          }
-          return m;
-        });
-
-        setMotorcycles(updatedMotors);
-        localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updatedMotors));
-        return true;
       }
     } catch (err: any) {
-      console.error('Add fuel log error:', err);
-      showCustomAlert('Error', err.message || 'Gagal menambahkan catatan bahan bakar.');
+      console.error('Save fuel log error:', err);
+      showCustomAlert('Error', err.message || 'Gagal menyimpan catatan bahan bakar.');
       return false;
     }
   };
@@ -960,6 +1006,10 @@ export default function Home() {
             activeMotor={activeMotor}
             fuelLogs={fuelLogs}
             onOpenAddFuelModal={() => setIsAddFuelOpen(true)}
+            onOpenEditFuelModal={(log) => {
+              setEditingFuelLog(log);
+              setIsAddFuelOpen(true);
+            }}
             onDeleteFuelLog={handleDeleteFuelLog}
             showConfirm={showCustomConfirm}
           />
@@ -1001,7 +1051,11 @@ export default function Home() {
       {isAddFuelOpen && activeMotor && (
         <AddFuelModal
           activeMotor={activeMotor}
-          onClose={() => setIsAddFuelOpen(false)}
+          editingLog={editingFuelLog}
+          onClose={() => {
+            setIsAddFuelOpen(false);
+            setEditingFuelLog(null);
+          }}
           onAdd={handleAddFuelLog}
         />
       )}

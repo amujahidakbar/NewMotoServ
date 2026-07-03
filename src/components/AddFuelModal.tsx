@@ -2,6 +2,15 @@
 
 import React, { useState } from 'react';
 
+interface FuelLog {
+  id: string;
+  motorcycleId: string;
+  date: string;
+  odometer: number;
+  liters: number;
+  price: number;
+}
+
 interface Motorcycle {
   id: string;
   name: string;
@@ -11,6 +20,7 @@ interface Motorcycle {
 
 interface AddFuelModalProps {
   activeMotor: Motorcycle;
+  editingLog?: FuelLog | null;
   onClose: () => void;
   onAdd: (data: {
     date: string;
@@ -22,13 +32,22 @@ interface AddFuelModalProps {
 
 export default function AddFuelModal({
   activeMotor,
+  editingLog,
   onClose,
   onAdd
 }: AddFuelModalProps) {
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [odometer, setOdometer] = useState(activeMotor.currentOdo);
-  const [liters, setLiters] = useState('');
-  const [price, setPrice] = useState('');
+  const [date, setDate] = useState(() => 
+    editingLog ? editingLog.date : new Date().toISOString().split('T')[0]
+  );
+  const [odometer, setOdometer] = useState(() => 
+    editingLog ? editingLog.odometer : activeMotor.currentOdo
+  );
+  const [liters, setLiters] = useState(() => 
+    editingLog ? editingLog.liters.toString() : ''
+  );
+  const [price, setPrice] = useState(() => 
+    editingLog ? editingLog.price.toString() : ''
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -81,7 +100,9 @@ export default function AddFuelModal({
       <div className="modal-dialog" style={{ width: '100%', maxWidth: '440px', background: 'var(--bg-surface-solid)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', animation: 'modalFadeIn 0.3s ease-out' }}>
         
         <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Catat Pengisian BBM</h3>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+            {editingLog ? 'Edit Catatan BBM' : 'Catat Pengisian BBM'}
+          </h3>
           <button 
             onClick={onClose} 
             style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0' }}
@@ -192,7 +213,7 @@ export default function AddFuelModal({
               disabled={loading}
               style={{ padding: '0.5rem 1rem', fontWeight: 600 }}
             >
-              {loading ? 'Menyimpan...' : 'Simpan Catatan'}
+              {loading ? 'Menyimpan...' : (editingLog ? 'Simpan Perubahan' : 'Simpan Catatan')}
             </button>
           </div>
         </form>
