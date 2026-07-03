@@ -42,6 +42,81 @@ export default function Sidebar({
   onToggleTheme
 }: SidebarProps) {
   const activeMotor = motorcycles.find(m => m.id === activeMotorcycleId);
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+
+  const renderProfileMenu = (position: 'desktop' | 'mobile') => {
+    const isDesktop = position === 'desktop';
+    return (
+      <div className="profile-menu-container">
+        <button 
+          className="avatar-btn" 
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: user ? 'var(--color-primary)' : 'var(--text-muted)',
+            color: 'var(--bg-base)',
+            border: 'none',
+            fontWeight: 700,
+            fontSize: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: 'var(--shadow-sm)'
+          }}
+          title="Menu Profil"
+          aria-label="Buka Menu Profil"
+          aria-expanded={showProfileMenu}
+        >
+          {user ? user.name.charAt(0).toUpperCase() : 'G'}
+        </button>
+
+        {showProfileMenu && (
+          <>
+            <div className="profile-menu-backdrop" onClick={() => setShowProfileMenu(false)} />
+            <div className="profile-dropdown-menu" style={isDesktop ? { bottom: '50px', top: 'auto', left: '0', right: 'auto' } : undefined}>
+              <div className="profile-dropdown-header">
+                <div className="profile-dropdown-avatar" style={{ backgroundColor: user ? 'var(--color-primary)' : 'var(--text-muted)' }}>
+                  {user ? user.name.charAt(0).toUpperCase() : 'G'}
+                </div>
+                <div className="profile-dropdown-info">
+                  <div className="profile-dropdown-name" style={{ color: 'var(--text-primary)' }}>
+                    {user ? user.name : 'Sesi Guest (Tamu)'}
+                  </div>
+                  <div className="profile-dropdown-email">
+                    {user ? user.email : 'Data Disimpan Lokal'}
+                  </div>
+                </div>
+              </div>
+              <div className="profile-dropdown-divider" />
+              <div className="profile-dropdown-body">
+                {user ? (
+                  <button 
+                    className="btn btn-secondary btn-sm profile-dropdown-btn-logout" 
+                    onClick={() => { setShowProfileMenu(false); onLogout(); }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    </svg>
+                    <span>Keluar</span>
+                  </button>
+                ) : (
+                  <button 
+                    className="btn btn-primary btn-sm profile-dropdown-btn-login" 
+                    onClick={() => { setShowProfileMenu(false); onOpenAuthModal(); }}
+                  >
+                    <span>Login / Daftar</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <header className="app-header">
@@ -55,35 +130,40 @@ export default function Sidebar({
           </div>
           <h1>Moto<span>Serv</span></h1>
         </div>
-        <button 
-          className="btn btn-secondary btn-icon-only theme-toggle-btn" 
-          onClick={onToggleTheme}
-          title={theme === 'dark' ? "Mode Terang" : "Mode Gelap"}
-          style={{ 
-            width: '32px', 
-            height: '32px', 
-            border: 'none', 
-            background: 'var(--border-color)', 
-            borderRadius: '50%',
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            cursor: 'pointer',
-            padding: '0',
-            color: 'var(--text-primary)'
-          }}
-          aria-label="Toggle tema tampilan"
-        >
-          {theme === 'dark' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
-              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-            </svg>
-          )}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button 
+            className="btn btn-secondary btn-icon-only theme-toggle-btn" 
+            onClick={onToggleTheme}
+            title={theme === 'dark' ? "Mode Terang" : "Mode Gelap"}
+            style={{ 
+              width: '32px', 
+              height: '32px', 
+              border: 'none', 
+              background: 'var(--border-color)', 
+              borderRadius: '50%',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '0',
+              color: 'var(--text-primary)'
+            }}
+            aria-label="Toggle tema tampilan"
+          >
+            {theme === 'dark' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+              </svg>
+            )}
+          </button>
+          <div className="mobile-profile-only">
+            {renderProfileMenu('mobile')}
+          </div>
+        </div>
       </div>
 
       {/* Active Motorcycle Selector */}
@@ -191,110 +271,8 @@ export default function Sidebar({
       </nav>
 
       {/* User Info Session & Logout */}
-      <div 
-        style={{ 
-          borderTop: '1px solid var(--border-color)', 
-          paddingTop: '1.25rem', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '0.75rem' 
-        }}
-      >
-        {user ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div 
-                style={{ 
-                  width: '32px', 
-                  height: '32px', 
-                  borderRadius: '50%', 
-                  backgroundColor: 'var(--color-primary)', 
-                  color: 'var(--bg-base)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  fontWeight: 700,
-                  fontSize: '0.95rem'
-                }}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div 
-                  style={{ 
-                    fontWeight: 600, 
-                    fontSize: '0.85rem', 
-                    color: 'var(--text-primary)', 
-                    overflow: 'hidden', 
-                    textOverflow: 'ellipsis', 
-                    whiteSpace: 'nowrap' 
-                  }}
-                >
-                  {user.name}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 500 }}>
-                  Awan Tersinkron
-                </div>
-              </div>
-            </div>
-            <button 
-              className="btn btn-secondary btn-sm" 
-              onClick={onLogout}
-              style={{ 
-                fontSize: '0.8rem', 
-                padding: '0.4rem 0.85rem', 
-                width: '100%', 
-                justifyContent: 'center',
-                borderColor: 'rgba(239, 68, 68, 0.15)',
-                color: 'var(--color-danger)'
-              }}
-            >
-              Keluar
-            </button>
-          </>
-        ) : (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div 
-                style={{ 
-                  width: '32px', 
-                  height: '32px', 
-                  borderRadius: '50%', 
-                  backgroundColor: 'var(--text-muted)', 
-                  color: 'var(--bg-base)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  fontWeight: 700,
-                  fontSize: '0.95rem'
-                }}
-              >
-                G
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
-                  Sesi Guest (Tamu)
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                  Data Disimpan Lokal
-                </div>
-              </div>
-            </div>
-            <button 
-              className="btn btn-primary btn-sm" 
-              onClick={onOpenAuthModal}
-              style={{ 
-                fontSize: '0.8rem', 
-                padding: '0.4rem 0.85rem', 
-                width: '100%', 
-                justifyContent: 'center',
-                fontWeight: 600
-              }}
-            >
-              Login untuk Backup
-            </button>
-          </>
-        )}
+      <div className="desktop-profile-only" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
+        {renderProfileMenu('desktop')}
       </div>
     </header>
   );
