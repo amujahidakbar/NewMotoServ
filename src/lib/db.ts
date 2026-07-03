@@ -117,6 +117,21 @@ async function runMigrations() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
+    // Create fuel_logs table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS fuel_logs (
+        id VARCHAR(50) PRIMARY KEY,
+        motorcycle_id VARCHAR(50) NOT NULL,
+        date DATE NOT NULL,
+        odometer INT NOT NULL,
+        liters DOUBLE NOT NULL,
+        price INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (motorcycle_id) REFERENCES motorcycles(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
     await connection.commit();
     console.log('Database tables verified/created successfully.');
   } catch (error) {

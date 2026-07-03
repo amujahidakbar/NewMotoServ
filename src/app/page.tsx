@@ -8,6 +8,8 @@ import DashboardTab from '@/components/DashboardTab';
 import HistoryTab from '@/components/HistoryTab';
 import GarageTab from '@/components/GarageTab';
 import SettingsTab from '@/components/SettingsTab';
+import FuelTab from '@/components/FuelTab';
+import AddFuelModal from '@/components/AddFuelModal';
 import AddMotorcycleModal from '@/components/AddMotorcycleModal';
 import UpdateOdometerModal from '@/components/UpdateOdometerModal';
 import AddServiceModal from '@/components/AddServiceModal';
@@ -35,6 +37,15 @@ interface ServiceLog {
   notes: string;
 }
 
+interface FuelLog {
+  id: string;
+  motorcycleId: string;
+  date: string;
+  odometer: number;
+  liters: number;
+  price: number;
+}
+
 interface User {
   id: number;
   name: string;
@@ -50,6 +61,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
+  const [isAddFuelOpen, setIsAddFuelOpen] = useState(false);
 
   // Modals state
   const [isAddMotorOpen, setIsAddMotorOpen] = useState(false);
@@ -149,6 +162,12 @@ export default function Home() {
         const logsData = await resLogs.json();
         setLogs(logsData);
       }
+
+      const resFuel = await fetch('/api/fuel-logs');
+      if (resFuel.ok) {
+        const fuelData = await resFuel.json();
+        setFuelLogs(fuelData);
+      }
     } catch (err) {
       console.error('Error fetching data from database:', err);
     }
@@ -164,8 +183,12 @@ export default function Home() {
       try {
         const motors = JSON.parse(cachedMotors);
         const serviceLogs = JSON.parse(cachedLogs);
+        const cachedFuel = localStorage.getItem('motoserv_guest_fuel_logs');
+        const fuelData = cachedFuel ? JSON.parse(cachedFuel) : [];
+        
         setMotorcycles(motors);
         setLogs(serviceLogs);
+        setFuelLogs(fuelData);
         
         if (motors.length > 0) {
           const isValid = motors.some((m: Motorcycle) => m.id === cachedActiveId);
@@ -188,9 +211,11 @@ export default function Home() {
   const initializeEmptyGuest = () => {
     setMotorcycles([]);
     setLogs([]);
+    setFuelLogs([]);
     setActiveMotorcycleId('');
     localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify([]));
     localStorage.setItem('motoserv_guest_logs', JSON.stringify([]));
+    localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify([]));
     localStorage.removeItem('motoserv_guest_active_motor_id');
   };
 
@@ -696,6 +721,88 @@ export default function Home() {
     );
   };
 
+  // 14a. Add fuel log handler
+  const handleAddFuelLog = async (fuelData: {
+    date: string;
+    odometer: number;
+    liters: number;
+    price: number;
+  }) => {
+    try {
+      if (user) {
+        const res = await fetch('/api/fuel-logs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            motorcycleId: activeMotorcycleId,
+            ...fuelData
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Gagal menyimpan catatan bahan bakar.');
+        }
+
+        await fetchDataFromDB();
+        return true;
+      } else {
+        const newLog: FuelLog = {
+          id: 'fuel_' + Math.random().toString(36).substring(2, 9),
+          motorcycleId: activeMotorcycleId,
+          ...fuelData
+        };
+
+        const updatedLogs = [newLog, ...fuelLogs];
+        setFuelLogs(updatedLogs);
+        localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify(updatedLogs));
+
+        const updatedMotors = motorcycles.map(m => {
+          if (m.id === activeMotorcycleId && fuelData.odometer > m.currentOdo) {
+            return { ...m, currentOdo: fuelData.odometer };
+          }
+          return m;
+        });
+
+        setMotorcycles(updatedMotors);
+        localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updatedMotors));
+        return true;
+      }
+    } catch (err: any) {
+      console.error('Add fuel log error:', err);
+      showCustomAlert('Error', err.message || 'Gagal menambahkan catatan bahan bakar.');
+      return false;
+    }
+  };
+
+  // 14b. Delete fuel log handler
+  const handleDeleteFuelLog = async (id: string) => {
+    try {
+      if (user) {
+        const res = await fetch(`/api/fuel-logs/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Gagal menghapus catatan bahan bakar.');
+        }
+
+        await fetchDataFromDB();
+        return true;
+      } else {
+        const updatedLogs = fuelLogs.filter(log => log.id !== id);
+        setFuelLogs(updatedLogs);
+        localStorage.setItem('motoserv_guest_fuel_logs', JSON.stringify(updatedLogs));
+        return true;
+      }
+    } catch (err: any) {
+      console.error('Delete fuel log error:', err);
+      showCustomAlert('Error', err.message || 'Gagal menghapus catatan bahan bakar.');
+      return false;
+    }
+  };
+
   // 15. Factory reset data handler
   const handleFactoryResetData = async () => {
     if (user) {
@@ -848,6 +955,16 @@ export default function Home() {
           />
         )}
 
+        {activeTab === 'bbm' && (
+          <FuelTab
+            activeMotor={activeMotor}
+            fuelLogs={fuelLogs}
+            onOpenAddFuelModal={() => setIsAddFuelOpen(true)}
+            onDeleteFuelLog={handleDeleteFuelLog}
+            showConfirm={showCustomConfirm}
+          />
+        )}
+
         <footer className="app-footer">
           <p>&copy; 2026 MotoServ. Dibuat oleh <a href="https://www.linkedin.com/in/amujahidakbar/" target="_blank" rel="noopener noreferrer">Mujahid Akbar</a>.</p>
         </footer>
@@ -878,6 +995,14 @@ export default function Home() {
             setPreselectedCompForService(undefined);
           }}
           onAddLog={handleAddServiceLog}
+        />
+      )}
+
+      {isAddFuelOpen && activeMotor && (
+        <AddFuelModal
+          activeMotor={activeMotor}
+          onClose={() => setIsAddFuelOpen(false)}
+          onAdd={handleAddFuelLog}
         />
       )}
 
@@ -941,6 +1066,19 @@ export default function Home() {
                   <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-success)', color: 'var(--bg-base)' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                  </div>
+                </button>
+
+                <button 
+                  className="mobile-fab-action-item" 
+                  onClick={() => { setIsFabOpen(false); setIsAddFuelOpen(true); }}
+                  aria-label="Catat BBM"
+                >
+                  <span className="mobile-fab-action-label">Catat BBM</span>
+                  <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--bg-base)' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-13-7-13S5 10.7 5 15a7 7 0 0 0 7 7z"/>
                     </svg>
                   </div>
                 </button>
