@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     }
 
     const logs = await db.query(`
-      SELECT fl.id, fl.motorcycle_id AS motorcycleId, fl.date, fl.odometer, 
+      SELECT fl.id, fl.motorcycle_id AS motorcycleId, DATE_FORMAT(fl.date, '%Y-%m-%d') AS date, fl.odometer, 
              fl.liters, fl.price
       FROM fuel_logs fl
       INNER JOIN motorcycles m ON fl.motorcycle_id = m.id
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     const formattedLogs = logs.map(log => ({
       ...log,
-      date: new Date(log.date).toISOString().split('T')[0]
+      date: log.date
     }));
 
     return NextResponse.json(formattedLogs);

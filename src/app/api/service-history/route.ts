@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     // Fetch service history for all motorcycles owned by this user
     // We join with motorcycles to verify ownership
     const logs = await db.query(`
-      SELECT sh.id, sh.motorcycle_id AS motorcycleId, sh.date, sh.odometer, 
+      SELECT sh.id, sh.motorcycle_id AS motorcycleId, DATE_FORMAT(sh.date, '%Y-%m-%d') AS date, sh.odometer, 
              sh.components, sh.cost, sh.notes
       FROM service_history sh
       INNER JOIN motorcycles m ON sh.motorcycle_id = m.id
@@ -34,8 +34,7 @@ export async function GET(req: NextRequest) {
       }
       return {
         ...log,
-        // Format date to YYYY-MM-DD
-        date: new Date(log.date).toISOString().split('T')[0],
+        date: log.date,
         components: comps
       };
     });
