@@ -33,6 +33,18 @@ interface FuelTabProps {
   ) => void;
 }
 
+// Format Date helper to prevent time zone shifts
+function formatDate(dateString: string) {
+  if (!dateString) return "-";
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const [year, month, day] = dateString.split('-');
+  if (year && month && day) {
+    const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return d.toLocaleDateString('id-ID', options);
+  }
+  return new Date(dateString).toLocaleDateString('id-ID', options);
+}
+
 export default function FuelTab({
   activeMotor,
   fuelLogs,
@@ -205,7 +217,7 @@ export default function FuelTab({
                   return (
                     <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <td style={{ padding: '0.75rem 0.5rem', whiteSpace: 'nowrap' }}>
-                        {new Date(log.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {formatDate(log.date)}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600 }}>
                         {log.odometer.toLocaleString('id-ID')} KM
