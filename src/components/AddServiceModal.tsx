@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getComponentsForType } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
   name: string;
   currentOdo: number;
+  type: string;
   intervals: Record<string, number>;
 }
 
@@ -89,7 +91,7 @@ export default function AddServiceModal({
     }
   };
 
-  const availableComponents = Object.keys(activeMotor.intervals);
+  const availableComponents = getComponentsForType(activeMotor.type || 'kopling');
 
   return (
     <div className="modal-backdrop open" id="modal-add-service-log" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 100 }}>

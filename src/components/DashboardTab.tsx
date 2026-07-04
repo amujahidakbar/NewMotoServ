@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { calculateMotorHealth, ComponentHealth } from '@/lib/calculations';
+import { getComponentsForType } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -182,11 +183,24 @@ export default function DashboardTab({
     );
   }
 
-  // 2. Calculate health metrics
+  // 2. Calculate health metrics for valid components only
+  const allowedComponents = getComponentsForType(activeMotor.type);
+  const filteredIntervals: Record<string, number> = {};
+  const filteredLastService: Record<string, number> = {};
+
+  allowedComponents.forEach(comp => {
+    filteredIntervals[comp] = activeMotor.intervals[comp] !== undefined 
+      ? activeMotor.intervals[comp] 
+      : 2000;
+    filteredLastService[comp] = activeMotor.lastService[comp] !== undefined 
+      ? activeMotor.lastService[comp] 
+      : 0;
+  });
+
   const healthMetrics = calculateMotorHealth(
     activeMotor.currentOdo,
-    activeMotor.intervals,
-    activeMotor.lastService
+    filteredIntervals,
+    filteredLastService
   );
 
   const { overallPercentage, criticalCount, warningCount, componentsHealth } = healthMetrics;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getComponentsForType } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -229,7 +230,7 @@ export default function SettingsTab({
     );
   };
 
-  const components = Object.keys(activeMotor.intervals);
+  const components = getComponentsForType(activeMotor.type || 'kopling');
 
   return (
     <section id="tab-pengaturan" className="tab-content active">
