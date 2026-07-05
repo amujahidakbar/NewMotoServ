@@ -48,9 +48,10 @@ export default function SettingsTab({
   const [feedbackName, setFeedbackName] = useState('');
   const [sendingFeedback, setSendingFeedback] = useState(false);
 
-  // Admin Feedback list states
+  // Admin Feedback and user states
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
+  const [userCount, setUserCount] = useState<number | null>(null);
 
   const isAdmin = user && (
     user.email.toLowerCase() === 'amujahidakbar@gmail.com' ||
@@ -74,9 +75,22 @@ export default function SettingsTab({
     }
   };
 
+  const fetchUserCount = async () => {
+    try {
+      const res = await fetch('/api/admin/users/count');
+      if (res.ok) {
+        const data = await res.json();
+        setUserCount(data.count);
+      }
+    } catch (e) {
+      console.error('Error fetching user count:', e);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) {
       fetchFeedbacks();
+      fetchUserCount();
     }
   }, [isAdmin]);
 
@@ -462,10 +476,10 @@ export default function SettingsTab({
       {isAdmin && (
         <div className="settings-card" style={{ marginTop: '1.5rem', border: '1px solid var(--color-primary)' }}>
           <div className="settings-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ color: 'var(--color-primary)' }}>Panel Admin: Masukan Pengguna</h3>
+            <h3 style={{ color: 'var(--color-primary)' }}>Panel Admin: Ringkasan & Masukan</h3>
             <button 
               className="btn btn-secondary btn-sm"
-              onClick={fetchFeedbacks}
+              onClick={() => { fetchFeedbacks(); fetchUserCount(); }}
               disabled={loadingFeedbacks}
               style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
             >
@@ -474,6 +488,23 @@ export default function SettingsTab({
           </div>
           
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Admin Metrics Row */}
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 200px', padding: '1rem', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-primary)', fontWeight: 600 }}>Total Pengguna Terdaftar</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
+                  {userCount !== null ? userCount.toLocaleString('id-ID') : '...'}
+                </div>
+              </div>
+              <div style={{ flex: '1 1 200px', padding: '1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Masukan & Saran</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
+                  {feedbacks.length}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.5rem 0' }}></div>
             {feedbacks.length === 0 ? (
               <p className="text-secondary" style={{ fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center', padding: '1rem' }}>
                 Belum ada masukan dari pengguna.
