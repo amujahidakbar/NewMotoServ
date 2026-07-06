@@ -6,6 +6,7 @@ interface Motorcycle {
   id: string;
   name: string;
   currentOdo: number;
+  intervals: Record<string, number>;
 }
 
 interface AddCustomComponentModalProps {
@@ -48,8 +49,8 @@ export default function AddCustomComponentModal({
       return;
     }
 
-    if (parsedLastService > activeMotor.currentOdo) {
-      setError('Odometer servis terakhir tidak boleh lebih besar dari odometer saat ini!');
+    if (Object.keys(activeMotor.intervals || {}).some(comp => comp.trim().toLowerCase() === name.toLowerCase())) {
+      setError('Komponen dengan nama ini sudah terdaftar pada motor Anda!');
       return;
     }
 
@@ -124,7 +125,7 @@ export default function AddCustomComponentModal({
                 required
                 style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)' }}
               />
-              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Kilometer odometer saat komponen ini diganti terakhir kali.</small>
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Kilometer odometer saat komponen ini diganti terakhir kali. Jika nilainya melebihi odometer motor saat ini, odometer motor akan otomatis disesuaikan.</small>
             </div>
           </div>
 

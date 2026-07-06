@@ -102,11 +102,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Sepeda motor tidak ditemukan!' }, { status: 404 });
     }
 
+    // Check for duplicate component name (case-insensitive)
+    const existing = await db.query(
+      'SELECT id FROM intervals WHERE motorcycle_id = ? AND LOWER(component_name) = ?',
+      [motorcycleId, trimmedComp.toLowerCase()]
+    ) as any[];
+
+    if (existing && existing.length > 0) {
+      return NextResponse.json(
+        { error: 'Komponen dengan nama ini sudah terdaftar pada motor Anda!' },
+        { status: 400 }
+      );
+    }
+
     const currentOdo = parseFloat(motors[0].currentOdo);
     if (parsedLastService > currentOdo) {
-      return NextResponse.json(
-        { error: 'Odometer servis terakhir tidak boleh lebih besar dari odometer motor saat ini!' },
-        { status: 400 }
+      // Auto-advance motorcycle odometer
+      await db.query(
+        'UPDATE motorcycles SET current_odo = ? WHERE id = ?',
+        [parsedLastService, motorcycleId]
       );
     }
 
