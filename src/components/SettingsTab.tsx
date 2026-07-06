@@ -48,10 +48,19 @@ export default function SettingsTab({
   const [feedbackName, setFeedbackName] = useState('');
   const [sendingFeedback, setSendingFeedback] = useState(false);
 
-  // Admin Feedback and user states
+  interface AdminStats {
+    totalUsers: number;
+    totalMotorcycles: number;
+    totalServiceLogs: number;
+    totalFuelLogs: number;
+    totalFeedbacks: number;
+    motorcycleTypes: { type: string; count: number }[];
+  }
+
+  // Admin Feedback and stats states
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
-  const [userCount, setUserCount] = useState<number | null>(null);
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
 
   const isAdmin = user && (
     user.email.toLowerCase() === 'amujahidakbar@gmail.com' ||
@@ -75,22 +84,22 @@ export default function SettingsTab({
     }
   };
 
-  const fetchUserCount = async () => {
+  const fetchAdminStats = async () => {
     try {
-      const res = await fetch('/api/admin/users/count');
+      const res = await fetch('/api/admin/stats');
       if (res.ok) {
         const data = await res.json();
-        setUserCount(data.count);
+        setAdminStats(data);
       }
     } catch (e) {
-      console.error('Error fetching user count:', e);
+      console.error('Error fetching admin stats:', e);
     }
   };
 
   useEffect(() => {
     if (isAdmin) {
       fetchFeedbacks();
-      fetchUserCount();
+      fetchAdminStats();
     }
   }, [isAdmin]);
 
@@ -479,7 +488,7 @@ export default function SettingsTab({
             <h3 style={{ color: 'var(--color-primary)' }}>Panel Admin: Ringkasan & Masukan</h3>
             <button 
               className="btn btn-secondary btn-sm"
-              onClick={() => { fetchFeedbacks(); fetchUserCount(); }}
+              onClick={() => { fetchFeedbacks(); fetchAdminStats(); }}
               disabled={loadingFeedbacks}
               style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
             >
@@ -489,22 +498,55 @@ export default function SettingsTab({
           
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Admin Metrics Row */}
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1 1 200px', padding: '1rem', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-primary)', fontWeight: 600 }}>Total Pengguna Terdaftar</div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
-                  {userCount !== null ? userCount.toLocaleString('id-ID') : '...'}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--color-primary)', fontWeight: 600, textTransform: 'uppercase' }}>Pengguna</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
+                  {adminStats !== null ? adminStats.totalUsers.toLocaleString('id-ID') : '...'}
                 </div>
               </div>
-              <div style={{ flex: '1 1 200px', padding: '1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 600 }}>Total Masukan & Saran</div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Motor</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
+                  {adminStats !== null ? adminStats.totalMotorcycles.toLocaleString('id-ID') : '...'}
+                </div>
+              </div>
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Log Servis</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
+                  {adminStats !== null ? adminStats.totalServiceLogs.toLocaleString('id-ID') : '...'}
+                </div>
+              </div>
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Log BBM</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
+                  {adminStats !== null ? adminStats.totalFuelLogs.toLocaleString('id-ID') : '...'}
+                </div>
+              </div>
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Saran</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {feedbacks.length}
                 </div>
               </div>
             </div>
 
-            <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.5rem 0' }}></div>
+            {/* Motorcycle Types Breakdown */}
+            {adminStats?.motorcycleTypes && adminStats.motorcycleTypes.length > 0 && (
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Proporsi Tipe Transmisi Motor Terdaftar:</div>
+                <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                  {adminStats.motorcycleTypes.map(t => (
+                    <div key={t.type} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <span className="badge" style={{ textTransform: 'capitalize', padding: '0.15rem 0.4rem', fontSize: '0.7rem' }}>{t.type}</span>
+                      <strong>{t.count} unit</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.25rem 0' }}></div>
             {feedbacks.length === 0 ? (
               <p className="text-secondary" style={{ fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center', padding: '1rem' }}>
                 Belum ada masukan dari pengguna.
