@@ -30,10 +30,7 @@ export default function UpdateOdometerModal({
     e.preventDefault();
     setError(null);
 
-    if (parsedNewOdo < activeMotor.currentOdo) {
-      setError('Odometer baru tidak boleh lebih kecil dari odometer saat ini!');
-      return;
-    }
+
 
     setLoading(true);
     const success = await onUpdate(parsedNewOdo);
@@ -76,15 +73,15 @@ export default function UpdateOdometerModal({
                     setNewOdo(e.target.value);
                     setError(null);
                   }}
-                  min={activeMotor.currentOdo}
+                  min="0"
                   step="any"
                   required
                   autoFocus
                   style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)' }}
                 />
-                {difference > 0 && (
-                  <span style={{ position: 'absolute', right: '1rem', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: '600' }}>
-                    +{difference.toLocaleString('id-ID')} KM
+                {difference !== 0 && (
+                  <span style={{ position: 'absolute', right: '1rem', fontSize: '0.8rem', color: difference > 0 ? 'var(--color-primary)' : 'var(--color-danger)', fontWeight: '600' }}>
+                    {difference > 0 ? `+${difference.toLocaleString('id-ID', { maximumFractionDigits: 1 })}` : difference.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM
                   </span>
                 )}
               </div>

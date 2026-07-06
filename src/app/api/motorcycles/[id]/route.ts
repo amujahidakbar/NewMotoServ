@@ -39,12 +39,7 @@ export async function PUT(
           { status: 400 }
         );
       }
-      if (newOdo < motor.currentOdo) {
-        return NextResponse.json(
-          { error: 'Odometer baru tidak boleh lebih kecil dari odometer saat ini!' },
-          { status: 400 }
-        );
-      }
+
 
       await db.query(
         'UPDATE motorcycles SET current_odo = ? WHERE id = ?',
