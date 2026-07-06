@@ -63,7 +63,7 @@ export async function PUT(
       );
     }
 
-    const parsedOdo = parseInt(odometer);
+    const parsedOdo = parseFloat(odometer);
     const parsedLiters = parseFloat(liters);
     const parsedPrice = parseInt(price);
 

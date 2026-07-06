@@ -40,7 +40,7 @@ export default function AddMotorcycleModal({
       brand,
       plate,
       type,
-      currentOdo: parseInt(currentOdo) || 0
+      currentOdo: parseFloat(currentOdo) || 0.0
     });
     setLoading(false);
 
@@ -128,6 +128,7 @@ export default function AddMotorcycleModal({
                   value={currentOdo}
                   onChange={(e) => setCurrentOdo(e.target.value)}
                   min="0"
+                  step="any"
                   required
                   style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)' }}
                 />

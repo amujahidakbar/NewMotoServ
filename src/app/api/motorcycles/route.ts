@@ -43,11 +43,12 @@ export async function GET(req: NextRequest) {
 
       const lastService: Record<string, number> = {};
       for (const row of lastServiceRows) {
-        lastService[row.component_name] = row.last_service_km;
+        lastService[row.component_name] = parseFloat(row.last_service_km) || 0;
       }
 
       result.push({
         ...motor,
+        currentOdo: parseFloat(motor.currentOdo) || 0,
         intervals,
         lastService
       });
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const parsedOdo = parseInt(currentOdo) || 0;
+    const parsedOdo = parseFloat(currentOdo) || 0.0;
     const motorId = generateMotorId();
 
     // 1. Insert motorcycle

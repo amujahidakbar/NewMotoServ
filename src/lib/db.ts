@@ -66,7 +66,7 @@ async function runMigrations() {
         brand VARCHAR(255),
         plate VARCHAR(50),
         type VARCHAR(50) NOT NULL,
-        current_odo INT DEFAULT 0,
+        current_odo DECIMAL(10, 1) DEFAULT 0.0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -93,7 +93,7 @@ async function runMigrations() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         motorcycle_id VARCHAR(50) NOT NULL,
         component_name VARCHAR(100) NOT NULL,
-        last_service_km INT NOT NULL DEFAULT 0,
+        last_service_km DECIMAL(10, 1) NOT NULL DEFAULT 0.0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (motorcycle_id) REFERENCES motorcycles(id) ON DELETE CASCADE,
@@ -107,7 +107,7 @@ async function runMigrations() {
         id VARCHAR(50) PRIMARY KEY,
         motorcycle_id VARCHAR(50) NOT NULL,
         date DATE NOT NULL,
-        odometer INT NOT NULL,
+        odometer DECIMAL(10, 1) NOT NULL,
         components TEXT NOT NULL, -- Will store stringified JSON array
         cost INT DEFAULT 0,
         notes TEXT,
@@ -123,7 +123,7 @@ async function runMigrations() {
         id VARCHAR(50) PRIMARY KEY,
         motorcycle_id VARCHAR(50) NOT NULL,
         date DATE NOT NULL,
-        odometer INT NOT NULL,
+        odometer DECIMAL(10, 1) NOT NULL,
         liters DOUBLE NOT NULL,
         price INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -145,6 +145,16 @@ async function runMigrations() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Alter existing tables columns to DECIMAL(10, 1) for odometer decimal support
+    try {
+      await connection.query('ALTER TABLE motorcycles MODIFY COLUMN current_odo DECIMAL(10, 1) DEFAULT 0.0');
+      await connection.query('ALTER TABLE last_services MODIFY COLUMN last_service_km DECIMAL(10, 1) NOT NULL DEFAULT 0.0');
+      await connection.query('ALTER TABLE service_history MODIFY COLUMN odometer DECIMAL(10, 1) NOT NULL');
+      await connection.query('ALTER TABLE fuel_logs MODIFY COLUMN odometer DECIMAL(10, 1) NOT NULL');
+    } catch (err) {
+      console.log('Columns already converted or migration error:', err);
+    }
 
     await connection.commit();
     console.log('Database tables verified/created successfully.');

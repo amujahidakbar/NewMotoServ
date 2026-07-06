@@ -32,7 +32,7 @@ export async function PUT(
 
     // If updating odometer
     if (body.currentOdo !== undefined) {
-      const newOdo = parseInt(body.currentOdo);
+      const newOdo = parseFloat(body.currentOdo);
       if (isNaN(newOdo)) {
         return NextResponse.json(
           { error: 'Odometer harus berupa angka!' },

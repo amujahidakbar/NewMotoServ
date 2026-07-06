@@ -339,7 +339,7 @@ export default function FuelTab({
                         {formatDate(log.date)}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600 }}>
-                        {log.odometer.toLocaleString('id-ID')} KM
+                        {log.odometer.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem' }}>
                         {log.liters.toFixed(2)} L

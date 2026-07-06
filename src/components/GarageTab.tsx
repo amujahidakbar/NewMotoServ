@@ -104,7 +104,7 @@ export default function GarageTab({
                 <div className="motor-card-info-grid">
                   <div className="info-box">
                     <span className="info-label">Odometer</span>
-                    <span className="info-val">{motor.currentOdo.toLocaleString('id-ID')} KM</span>
+                    <span className="info-val">{motor.currentOdo.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM</span>
                   </div>
                   <div className="info-box">
                     <span className="info-label">No. Polisi</span>

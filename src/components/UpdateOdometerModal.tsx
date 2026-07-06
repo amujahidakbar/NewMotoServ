@@ -23,7 +23,7 @@ export default function UpdateOdometerModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const parsedNewOdo = parseInt(newOdo) || 0;
+  const parsedNewOdo = parseFloat(newOdo) || 0.0;
   const difference = parsedNewOdo - activeMotor.currentOdo;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,6 +77,7 @@ export default function UpdateOdometerModal({
                     setError(null);
                   }}
                   min={activeMotor.currentOdo}
+                  step="any"
                   required
                   autoFocus
                   style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)' }}

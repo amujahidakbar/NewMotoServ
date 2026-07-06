@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
       }
       return {
         ...log,
+        odometer: parseFloat(log.odometer) || 0,
         date: log.date,
         components: comps
       };
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const parsedOdo = parseInt(odometer);
+    const parsedOdo = parseFloat(odometer);
     const parsedCost = parseInt(cost) || 0;
 
     // Verify ownership of the motorcycle

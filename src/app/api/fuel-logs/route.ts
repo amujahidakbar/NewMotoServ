@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
 
     const formattedLogs = logs.map(log => ({
       ...log,
+      odometer: parseFloat(log.odometer) || 0,
       date: log.date
     }));
 
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const parsedOdo = parseInt(odometer);
+    const parsedOdo = parseFloat(odometer);
     const parsedLiters = parseFloat(liters);
     const parsedPrice = parseInt(price);
 

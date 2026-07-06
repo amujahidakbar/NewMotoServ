@@ -208,7 +208,7 @@ export default function Sidebar({
           <div className="odo-info">
             <span className="odo-label">Odometer Saat Ini</span>
             <span className="odo-value" id="header-odometer-value">
-              {activeMotor.currentOdo.toLocaleString('id-ID')} <small>KM</small>
+              {activeMotor.currentOdo.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} <small>KM</small>
             </span>
           </div>
           <button 

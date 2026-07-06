@@ -64,7 +64,7 @@ export default function AddServiceModal({
     e.preventDefault();
     setError(null);
 
-    const parsedOdo = parseInt(odometer);
+    const parsedOdo = parseFloat(odometer);
 
     if (isNaN(parsedOdo) || parsedOdo < 0) {
       setError('Odometer harus berupa angka positif!');
@@ -130,6 +130,7 @@ export default function AddServiceModal({
                   value={odometer}
                   onChange={(e) => setOdometer(e.target.value)}
                   min="0"
+                  step="any"
                   required
                   style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)' }}
                 />

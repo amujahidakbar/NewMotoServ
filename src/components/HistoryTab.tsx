@@ -249,7 +249,7 @@ export default function HistoryTab({
                       <span className="log-date">{formatDate(log.date)}</span>
                     </td>
                     <td>
-                      <strong>{log.odometer.toLocaleString('id-ID')} KM</strong>
+                      <strong>{log.odometer.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM</strong>
                     </td>
                     <td>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>

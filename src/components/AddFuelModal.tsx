@@ -44,8 +44,8 @@ export default function AddFuelModal({
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
-  const [odometer, setOdometer] = useState(() => 
-    editingLog ? editingLog.odometer : activeMotor.currentOdo
+  const [odometer, setOdometer] = useState<string>(() => 
+    editingLog ? editingLog.odometer.toString() : activeMotor.currentOdo.toString()
   );
   const [liters, setLiters] = useState(() => 
     editingLog ? editingLog.liters.toString() : ''
@@ -60,7 +60,7 @@ export default function AddFuelModal({
     e.preventDefault();
     setError('');
 
-    const parsedOdo = parseInt(odometer.toString());
+    const parsedOdo = parseFloat(odometer.toString());
     const parsedLiters = parseFloat(liters);
     const parsedPrice = parseInt(price);
 
@@ -156,9 +156,10 @@ export default function AddFuelModal({
                   className="form-control"
                   placeholder={`Contoh: ${activeMotor.currentOdo}`}
                   value={odometer}
-                  onChange={(e) => setOdometer(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setOdometer(e.target.value)}
                   required
                   min="0"
+                  step="any"
                   style={{ width: '100%', padding: '0.65rem 1rem', fontSize: '0.9rem' }}
                 />
               </div>
