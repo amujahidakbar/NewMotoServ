@@ -53,7 +53,9 @@ export default function FuelTab({
   onDeleteFuelLog,
   showConfirm
 }: FuelTabProps) {
-  const [filterMonth, setFilterMonth] = useState('');
+  const [timeRange, setTimeRange] = useState<'all' | '30' | '90' | 'year' | 'custom'>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   if (!activeMotor) {
     return (
@@ -75,8 +77,47 @@ export default function FuelTab({
     .filter(log => log.motorcycleId === activeMotor.id)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || b.odometer - a.odometer);
 
+  const filteredMotorLogs = motorLogs.filter(log => {
+    const logDate = new Date(log.date);
+    logDate.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    if (timeRange === '30') {
+      const limit = new Date(today);
+      limit.setDate(limit.getDate() - 30);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === '90') {
+      const limit = new Date(today);
+      limit.setDate(limit.getDate() - 90);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === 'year') {
+      const limit = new Date(today.getFullYear(), 0, 1);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === 'custom') {
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0,0,0,0);
+        if (logDate < start) return false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23,59,59,999);
+        if (logDate > end) return false;
+      }
+    }
+    
+    return true;
+  });
+
   // For calculations, we need chronological order (oldest first)
-  const chronoLogs = [...motorLogs].reverse();
+  const chronoLogs = [...filteredMotorLogs].reverse();
 
   // Calculate statistics
   let totalLiters = 0;
@@ -98,7 +139,10 @@ export default function FuelTab({
 
   if (chronoLogs.length > 0) {
     const d1 = new Date(chronoLogs[0].date);
-    const d2 = new Date();
+    let d2 = new Date();
+    if (timeRange === 'custom' && endDate) {
+      d2 = new Date(endDate);
+    }
     
     d1.setHours(0, 0, 0, 0);
     d2.setHours(0, 0, 0, 0);
@@ -200,13 +244,57 @@ export default function FuelTab({
 
       {/* Fuel Log List Table */}
       <div className="card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.25rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Riwayat Pengisian Bahan Bakar</h3>
+          
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Filter Rentang:</label>
+            <select 
+              className="custom-select custom-select-sm"
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as any)}
+              style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}
+            >
+              <option value="all">Semua Waktu</option>
+              <option value="30">30 Hari Terakhir</option>
+              <option value="90">90 Hari Terakhir</option>
+              <option value="year">Tahun Ini</option>
+              <option value="custom">Kustom (Pilih Tanggal)</option>
+            </select>
+          </div>
         </div>
 
-        {motorLogs.length === 0 ? (
+        {timeRange === 'custom' && (
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', marginBottom: '1.25rem', animation: 'fadeIn 0.2s ease-out' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Mulai</label>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={startDate} 
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{ padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)' }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Selesai</label>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={endDate} 
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{ padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)' }}
+              />
+            </div>
+          </div>
+        )}
+
+        {filteredMotorLogs.length === 0 ? (
           <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Belum ada catatan pengisian BBM. Klik tombol "Catat BBM" di atas untuk menambah data.
+            {timeRange === 'all' 
+              ? 'Belum ada catatan pengisian BBM. Klik tombol "Catat BBM" di atas untuk menambah data.'
+              : 'Tidak ditemukan catatan BBM untuk rentang waktu terpilih.'
+            }
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -223,7 +311,7 @@ export default function FuelTab({
                 </tr>
               </thead>
               <tbody>
-                {motorLogs.map((log, index) => {
+                {filteredMotorLogs.map((log, index) => {
                   // To calculate efficiency, we look for the next chronological log (which is index+1 in chronoLogs, meaning index-1 in sorted motorLogs)
                   let tripKmL = 0;
                   let tripCostKm = 0;

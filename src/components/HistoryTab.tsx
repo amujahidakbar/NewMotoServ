@@ -51,6 +51,9 @@ export default function HistoryTab({
   onOpenAddServiceModal
 }: HistoryTabProps) {
   const [filterComponent, setFilterComponent] = useState('all');
+  const [timeRange, setTimeRange] = useState<'all' | '30' | '90' | 'year' | 'custom'>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   if (!activeMotor) {
     return (
@@ -70,9 +73,50 @@ export default function HistoryTab({
   // Filter logs by active motorcycle and selected component filter
   const motorLogs = logs.filter(log => log.motorcycleId === activeMotor.id);
   
-  const filteredLogs = filterComponent === 'all' 
-    ? motorLogs 
-    : motorLogs.filter(log => log.components.includes(filterComponent));
+  const filteredLogs = motorLogs.filter(log => {
+    // 1. Filter by component
+    if (filterComponent !== 'all' && !log.components.includes(filterComponent)) {
+      return false;
+    }
+    
+    // 2. Filter by date range
+    const logDate = new Date(log.date);
+    logDate.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    if (timeRange === '30') {
+      const limit = new Date(today);
+      limit.setDate(limit.getDate() - 30);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === '90') {
+      const limit = new Date(today);
+      limit.setDate(limit.getDate() - 90);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === 'year') {
+      const limit = new Date(today.getFullYear(), 0, 1);
+      return logDate >= limit;
+    }
+    
+    if (timeRange === 'custom') {
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0,0,0,0);
+        if (logDate < start) return false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23,59,59,999);
+        if (logDate > end) return false;
+      }
+    }
+    
+    return true;
+  });
 
   // Get list of all component options to populate filter dropdown based on logs available
   const componentFilterOptions = [
@@ -101,21 +145,66 @@ export default function HistoryTab({
       </div>
 
       {/* History Filters */}
-      <div className="filters-card">
-        <div className="filter-group">
-          <label htmlFor="filter-component">Filter Komponen</label>
-          <select 
-            id="filter-component" 
-            className="custom-select custom-select-sm"
-            value={filterComponent}
-            onChange={(e) => setFilterComponent(e.target.value)}
-          >
-            <option value="all">Semua Komponen</option>
-            {componentFilterOptions.map(opt => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </select>
+      <div className="filters-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <div className="filter-group" style={{ flex: '1 1 200px' }}>
+            <label htmlFor="filter-component">Filter Suku Cadang</label>
+            <select 
+              id="filter-component" 
+              className="custom-select custom-select-sm"
+              value={filterComponent}
+              onChange={(e) => setFilterComponent(e.target.value)}
+              style={{ width: '100%' }}
+            >
+              <option value="all">Semua Komponen</option>
+              {componentFilterOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group" style={{ flex: '1 1 200px' }}>
+            <label htmlFor="filter-timerange">Rentang Waktu</label>
+            <select 
+              id="filter-timerange" 
+              className="custom-select custom-select-sm"
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as any)}
+              style={{ width: '100%' }}
+            >
+              <option value="all">Semua Waktu</option>
+              <option value="30">30 Hari Terakhir</option>
+              <option value="90">90 Hari Terakhir</option>
+              <option value="year">Tahun Ini</option>
+              <option value="custom">Kustom (Pilih Tanggal)</option>
+            </select>
+          </div>
         </div>
+
+        {timeRange === 'custom' && (
+          <div className="filter-date-inputs" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', animation: 'fadeIn 0.2s ease-out' }}>
+            <div className="filter-group" style={{ flex: '1 1 140px', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Mulai</label>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={startDate} 
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)' }}
+              />
+            </div>
+            <div className="filter-group" style={{ flex: '1 1 140px', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Selesai</label>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={endDate} 
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)' }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Service History List */}
