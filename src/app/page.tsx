@@ -13,6 +13,7 @@ import AddFuelModal from '@/components/AddFuelModal';
 import AddMotorcycleModal from '@/components/AddMotorcycleModal';
 import UpdateOdometerModal from '@/components/UpdateOdometerModal';
 import AddServiceModal from '@/components/AddServiceModal';
+import AddCustomComponentModal from '@/components/AddCustomComponentModal';
 import CustomDialog from '@/components/CustomDialog';
 import { DEFAULT_INTERVALS, normalizeMotorType } from '@/lib/constants';
 
@@ -71,6 +72,7 @@ export default function Home() {
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [preselectedCompForService, setPreselectedCompForService] = useState<string | undefined>(undefined);
+  const [isAddCustomCompOpen, setIsAddCustomCompOpen] = useState(false);
 
   // Custom dialogs state
   const [dialogConfig, setDialogConfig] = useState<{
@@ -500,6 +502,74 @@ export default function Home() {
         localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updated));
         return updated;
       });
+      return true;
+    }
+  };
+
+  // 10.b Add custom component handler
+  const handleAddCustomComponent = async (componentName: string, intervalKm: number, lastServiceKm: number) => {
+    if (user) {
+      try {
+        const res = await fetch('/api/intervals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            motorcycleId: activeMotorcycleId,
+            componentName,
+            intervalKm,
+            lastServiceKm
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        setMotorcycles(prev =>
+          prev.map(m => {
+            if (m.id === activeMotorcycleId) {
+              return {
+                ...m,
+                intervals: {
+                  ...m.intervals,
+                  [componentName]: intervalKm
+                },
+                lastService: {
+                  ...m.lastService,
+                  [componentName]: lastServiceKm
+                }
+              };
+            }
+            return m;
+          })
+        );
+        showCustomAlert('Sukses', 'Komponen baru berhasil ditambahkan!');
+        return true;
+      } catch (err: any) {
+        showCustomAlert('Error', err.message || 'Gagal menambahkan komponen baru.');
+        return false;
+      }
+    } else {
+      // Guest local storage update
+      setMotorcycles(prev => {
+        const updated = prev.map(m => {
+          if (m.id === activeMotorcycleId) {
+            return {
+              ...m,
+              intervals: {
+                ...m.intervals,
+                [componentName]: intervalKm
+              },
+              lastService: {
+                ...m.lastService,
+                [componentName]: lastServiceKm
+              }
+            };
+          }
+          return m;
+        });
+        localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updated));
+        return updated;
+      });
+      showCustomAlert('Sukses', 'Komponen baru berhasil ditambahkan secara lokal!');
       return true;
     }
   };
@@ -996,6 +1066,7 @@ export default function Home() {
             onResetIntervals={handleResetIntervals}
             onFactoryResetData={handleFactoryResetData}
             onOpenAuthModal={() => setIsAuthOpen(true)}
+            onOpenAddCustomComponentModal={() => setIsAddCustomCompOpen(true)}
             showAlert={showCustomAlert}
             showConfirm={showCustomConfirm}
           />
@@ -1057,6 +1128,14 @@ export default function Home() {
             setEditingFuelLog(null);
           }}
           onAdd={handleAddFuelLog}
+        />
+      )}
+
+      {isAddCustomCompOpen && activeMotor && (
+        <AddCustomComponentModal
+          activeMotor={activeMotor}
+          onClose={() => setIsAddCustomCompOpen(false)}
+          onAdd={handleAddCustomComponent}
         />
       )}
 

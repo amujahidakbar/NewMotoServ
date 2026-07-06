@@ -17,6 +17,7 @@ interface SettingsTabProps {
   onResetIntervals: () => Promise<boolean>;
   onFactoryResetData: () => Promise<boolean>;
   onOpenAuthModal: () => void;
+  onOpenAddCustomComponentModal: () => void;
   showAlert: (title: string, message: string, onOk?: () => void) => void;
   showConfirm: (
     title: string, 
@@ -34,6 +35,7 @@ export default function SettingsTab({
   onResetIntervals,
   onFactoryResetData,
   onOpenAuthModal,
+  onOpenAddCustomComponentModal,
   showAlert,
   showConfirm
 }: SettingsTabProps) {
@@ -253,7 +255,11 @@ export default function SettingsTab({
     );
   };
 
-  const components = getComponentsForType(activeMotor.type || 'kopling');
+  const defaultComponents = getComponentsForType(activeMotor.type || 'kopling') as string[];
+  const customComponents = Object.keys(activeMotor.intervals || {}).filter(
+    comp => !defaultComponents.includes(comp)
+  );
+  const components = [...defaultComponents, ...customComponents];
 
   return (
     <section id="tab-pengaturan" className="tab-content active">
@@ -280,7 +286,7 @@ export default function SettingsTab({
                 </div>
               ))}
             </div>
-            <div className="settings-actions" style={{ display: 'flex', gap: '0.75rem' }}>
+            <div className="settings-actions" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <button 
                 type="button" 
                 className="btn btn-primary btn-icon" 
@@ -294,6 +300,18 @@ export default function SettingsTab({
                   <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
                 <span>Ubah Interval</span>
+              </button>
+              
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-icon" 
+                onClick={onOpenAddCustomComponentModal}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span>Tambah Komponen</span>
               </button>
             </div>
           </div>

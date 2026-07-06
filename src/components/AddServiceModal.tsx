@@ -91,7 +91,11 @@ export default function AddServiceModal({
     }
   };
 
-  const availableComponents = getComponentsForType(activeMotor.type || 'kopling');
+  const defaultComponents = getComponentsForType(activeMotor.type || 'kopling') as string[];
+  const customComponents = Object.keys(activeMotor.intervals || {}).filter(
+    comp => !defaultComponents.includes(comp)
+  );
+  const availableComponents = [...defaultComponents, ...customComponents];
 
   return (
     <div className="modal-backdrop open" id="modal-add-service-log" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
