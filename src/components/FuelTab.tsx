@@ -91,6 +91,27 @@ export default function FuelTab({
     totalCost += log.price;
   });
 
+  // Daily fuel consumption calculations
+  let dailyLiters = 0;
+  let dailyCost = 0;
+  let totalDays = 0;
+
+  if (chronoLogs.length > 0) {
+    const d1 = new Date(chronoLogs[0].date);
+    const d2 = new Date();
+    
+    d1.setHours(0, 0, 0, 0);
+    d2.setHours(0, 0, 0, 0);
+    
+    const diffTime = d2.getTime() - d1.getTime();
+    totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (totalDays <= 0) totalDays = 1;
+    
+    dailyLiters = totalLiters / totalDays;
+    dailyCost = totalCost / totalDays;
+  }
+
   if (chronoLogs.length >= 2) {
     const firstLog = chronoLogs[0];
     const lastLog = chronoLogs[chronoLogs.length - 1];
@@ -163,6 +184,16 @@ export default function FuelTab({
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
             Total volume: {totalLiters.toFixed(1)} Liter ({chronoLogs.length} kali isi)
+          </div>
+        </div>
+
+        <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Konsumsi BBM Harian</div>
+          <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
+            {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/Hari</small>
+          </div>
+          <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            {chronoLogs.length > 0 ? `Rp ${Math.round(dailyCost).toLocaleString('id-ID')} / hari (${totalDays} hari)` : 'Belum ada data'}
           </div>
         </div>
       </div>
