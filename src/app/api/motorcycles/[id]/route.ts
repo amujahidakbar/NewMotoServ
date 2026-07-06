@@ -46,6 +46,10 @@ export async function PUT(
         [newOdo, id]
       );
 
+      // Async push notification check
+      const { checkAndNotifyCriticalComponents } = await import('@/lib/notifications');
+      checkAndNotifyCriticalComponents(user.id, id, newOdo).catch(() => {});
+
       return NextResponse.json({ message: 'Odometer berhasil diperbarui!', currentOdo: newOdo });
     }
 

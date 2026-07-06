@@ -18,6 +18,8 @@ interface SettingsTabProps {
   onFactoryResetData: () => Promise<boolean>;
   onOpenAuthModal: () => void;
   onOpenAddCustomComponentModal: () => void;
+  isPushEnabled: boolean;
+  onSubscribeNotifications: () => void;
   showAlert: (title: string, message: string, onOk?: () => void) => void;
   showConfirm: (
     title: string, 
@@ -36,6 +38,8 @@ export default function SettingsTab({
   onFactoryResetData,
   onOpenAuthModal,
   onOpenAddCustomComponentModal,
+  isPushEnabled,
+  onSubscribeNotifications,
   showAlert,
   showConfirm
 }: SettingsTabProps) {
@@ -415,6 +419,64 @@ export default function SettingsTab({
                 Login / Register Akun Backup
               </button>
             </>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Push Notifications Settings */}
+      <div className="settings-card" style={{ marginTop: '1.5rem' }}>
+        <div className="settings-card-header">
+          <h3>Notifikasi HP Pengguna</h3>
+          <span 
+            className={`sync-badge ${isPushEnabled && user ? 'status-connected' : 'status-disconnected'}`}
+            style={{ 
+              fontSize: '0.7rem', 
+              padding: '0.2rem 0.45rem', 
+              borderRadius: 'var(--radius-sm)', 
+              fontWeight: 600, 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.5px' 
+            }}
+          >
+            {isPushEnabled && user ? 'Aktif' : 'Non-aktif'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+          <p className="text-secondary" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
+            Dapatkan notifikasi sistem secara instan ke HP Anda jika ada komponen motor yang memerlukan servis (misal: oli mesin melewati batas jarak).
+          </p>
+          {!user ? (
+            <div style={{ background: 'rgba(255, 230, 230, 0.03)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Silakan login terlebih dahulu untuk mendaftarkan perangkat Anda dengan push notifications cloud.
+            </div>
+          ) : isPushEnabled ? (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-sm"
+                disabled
+                style={{ fontSize: '0.85rem', padding: '0.45rem 1rem', opacity: 0.8 }}
+              >
+                Notifikasi HP Terdaftar
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-sm"
+                onClick={onSubscribeNotifications}
+                style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
+              >
+                Daftarkan Ulang Perangkat
+              </button>
+            </div>
+          ) : (
+            <button 
+              type="button" 
+              className="btn btn-primary"
+              onClick={onSubscribeNotifications}
+              style={{ alignSelf: 'flex-start' }}
+            >
+              Aktifkan Notifikasi HP Saya
+            </button>
           )}
         </div>
       </div>

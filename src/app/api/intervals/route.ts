@@ -138,6 +138,11 @@ export async function POST(req: NextRequest) {
       ON DUPLICATE KEY UPDATE last_service_km = VALUES(last_service_km)
     `, [motorcycleId, trimmedComp, parsedLastService]);
 
+    // Async push notification check
+    const finalOdo = parsedLastService > currentOdo ? parsedLastService : currentOdo;
+    const { checkAndNotifyCriticalComponents } = await import('@/lib/notifications');
+    checkAndNotifyCriticalComponents(user.id, motorcycleId, finalOdo).catch(() => {});
+
     return NextResponse.json({ message: 'Komponen kustom berhasil ditambahkan!' });
 
   } catch (error: any) {

@@ -146,6 +146,19 @@ async function runMigrations() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
+    // Create push_subscriptions table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        endpoint TEXT NOT NULL,
+        keys_p256dh VARCHAR(255) NOT NULL,
+        keys_auth VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
     // Alter existing tables columns to DECIMAL(10, 1) for odometer decimal support
     try {
       await connection.query('ALTER TABLE motorcycles MODIFY COLUMN current_odo DECIMAL(10, 1) DEFAULT 0.0');

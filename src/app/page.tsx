@@ -73,6 +73,7 @@ export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [preselectedCompForService, setPreselectedCompForService] = useState<string | undefined>(undefined);
   const [isAddCustomCompOpen, setIsAddCustomCompOpen] = useState(false);
+  const [isPushEnabled, setIsPushEnabled] = useState(false);
 
   // Custom dialogs state
   const [dialogConfig, setDialogConfig] = useState<{
@@ -259,6 +260,13 @@ export default function Home() {
       document.body.classList.remove('light-theme');
     }
   }, [theme]);
+
+  // 3c. Read notification subscription state on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      setIsPushEnabled(true);
+    }
+  }, []);
 
   // 4. Fetch database data once user state changes to logged-in
   useEffect(() => {
@@ -571,6 +579,78 @@ export default function Home() {
       });
       showCustomAlert('Sukses', 'Komponen baru berhasil ditambahkan secara lokal!');
       return true;
+    }
+  };
+
+  // 10.c Subscribe push notifications handler
+  const handleSubscribeNotifications = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      showCustomAlert('Info', 'Browser atau perangkat Anda tidak mendukung notifikasi push.');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        showCustomAlert('Gagal', 'Izin notifikasi ditolak oleh pengguna.');
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        showCustomAlert('Error', 'Kunci VAPID tidak terkonfigurasi.');
+        return;
+      }
+
+      const urlBase64ToUint8Array = (base64String: string) => {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+          .replace(/\-/g, '+')
+          .replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+      };
+
+      const subscribeOptions = {
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      };
+
+      const subscription = await registration.pushManager.subscribe(subscribeOptions);
+      const subJson = subscription.toJSON();
+      
+      if (!subJson.endpoint || !subJson.keys || !subJson.keys.p256dh || !subJson.keys.auth) {
+        throw new Error('Format Subscription tidak valid.');
+      }
+
+      const res = await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: {
+            endpoint: subJson.endpoint,
+            keys: {
+              p256dh: subJson.keys.p256dh,
+              auth: subJson.keys.auth
+            }
+          }
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      showCustomAlert('Sukses', 'Notifikasi HP berhasil diaktifkan!');
+      setIsPushEnabled(true);
+    } catch (err: any) {
+      console.error(err);
+      showCustomAlert('Error', err.message || 'Gagal mengaktifkan notifikasi.');
     }
   };
 
@@ -1067,6 +1147,8 @@ export default function Home() {
             onFactoryResetData={handleFactoryResetData}
             onOpenAuthModal={() => setIsAuthOpen(true)}
             onOpenAddCustomComponentModal={() => setIsAddCustomCompOpen(true)}
+            isPushEnabled={isPushEnabled}
+            onSubscribeNotifications={handleSubscribeNotifications}
             showAlert={showCustomAlert}
             showConfirm={showCustomConfirm}
           />
