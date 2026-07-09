@@ -67,12 +67,12 @@ export default function AddServiceModal({
     const parsedOdo = parseFloat(odometer);
 
     if (isNaN(parsedOdo) || parsedOdo < 0) {
-      setError('Odometer harus berupa angka positif!');
+      setError('Odometer must be a positive number!');
       return;
     }
 
     if (selectedComponents.length === 0) {
-      setError('Pilih minimal satu komponen yang diservis!');
+      setError('Select at least one component to service!');
       return;
     }
 
@@ -101,7 +101,7 @@ export default function AddServiceModal({
     <div className="modal-backdrop open" id="modal-add-service-log" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
       <div className="modal-dialog" style={{ maxWidth: '500px', width: '90%', margin: '0 auto', background: 'var(--bg-surface-solid)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)' }}>
         <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)' }}>Catat Servis Suku Cadang</h3>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)' }}>Record Part Service</h3>
           <button className="btn-close-modal" onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
         </div>
         
@@ -115,7 +115,7 @@ export default function AddServiceModal({
 
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Tanggal Servis</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Service Date</label>
                 <input
                   type="date"
                   className="form-control"
@@ -127,7 +127,7 @@ export default function AddServiceModal({
               </div>
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Odometer Servis (KM)</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Service Odometer (KM)</label>
                 <input
                   type="number"
                   className="form-control"
@@ -143,7 +143,7 @@ export default function AddServiceModal({
 
             {/* Checkboxes grid for components */}
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Suku Cadang / Komponen Yang Diganti</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Replaced Parts / Components</label>
               <div 
                 style={{ 
                   display: 'grid', 
@@ -180,15 +180,15 @@ export default function AddServiceModal({
                   </label>
                 ))}
               </div>
-              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Bisa memilih lebih dari satu komponen sekaligus jika diservis bersamaan.</small>
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>You can select multiple components if they were serviced at the same time.</small>
             </div>
 
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Total Biaya (Rp - Opsional)</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Total Cost (IDR - Optional)</label>
               <input
                 type="number"
                 className="form-control"
-                placeholder="Contoh: 150000"
+                placeholder="e.g. 150000"
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
                 min="0"
@@ -197,10 +197,10 @@ export default function AddServiceModal({
             </div>
 
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Catatan & Keterangan (Opsional)</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Notes & Details (Optional)</label>
               <textarea
                 className="form-control"
-                placeholder="Contoh: Ganti oli mesin federal dan filter udara asli AHM."
+                placeholder="e.g. Changed engine oil with fully synthetic oil and replaced air filter."
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -210,9 +210,9 @@ export default function AddServiceModal({
           </div>
 
           <div className="modal-footer" style={{ display: 'flex', gap: '0.75rem', padding: '1rem 1.5rem', borderTop: '1px solid var(--border-color)', justifyContent: 'flex-end' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>Batal</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Menyimpan...' : 'Catat Servis'}
+              {loading ? 'Saving...' : 'Record Service'}
             </button>
           </div>
         </form>

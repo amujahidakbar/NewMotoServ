@@ -298,7 +298,7 @@ export default function Home() {
           });
           
           if (syncRes.ok) {
-            showCustomAlert('Sinkronisasi Sukses', 'Data lokal Anda berhasil disinkronkan ke database cloud.');
+            showCustomAlert('Sync Success', 'Your local data has been successfully synchronized to the cloud database.');
             // Clear guest cache
             localStorage.removeItem('motoserv_guest_motorcycles');
             localStorage.removeItem('motoserv_guest_logs');
@@ -317,19 +317,19 @@ export default function Home() {
   // 6. Logout handler
   const handleLogout = () => {
     showCustomConfirm(
-      'Konfirmasi Keluar',
-      'Apakah Anda yakin ingin keluar dari akun Anda? Seluruh data yang tersimpan di cloud tetap aman.',
+      'Confirm Logout',
+      'Are you sure you want to log out of your account? Your cloud data will remain secure.',
       async () => {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
           setUser(null);
-          showCustomAlert('Sesi Berakhir', 'Anda telah berhasil keluar.');
+          showCustomAlert('Logged Out', 'You have been successfully logged out.');
         } catch (err) {
           console.error('Logout error:', err);
         }
       },
       undefined,
-      { confirmText: 'Keluar', cancelText: 'Batal', isDanger: true }
+      { confirmText: 'Log Out', cancelText: 'Cancel', isDanger: true }
     );
   };
 
@@ -379,7 +379,7 @@ export default function Home() {
         });
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal menambahkan motor.');
+        showCustomAlert('Error', err.message || 'Failed to add motorcycle.');
         return false;
       }
     } else {
@@ -423,8 +423,8 @@ export default function Home() {
     if (!motor) return;
 
     showCustomConfirm(
-      'Hapus Sepeda Motor',
-      `Apakah Anda yakin ingin menghapus sepeda motor "${motor.name}"? Seluruh data interval kustom dan riwayat servis motor ini akan ikut terhapus permanen.`,
+      'Delete Motorcycle',
+      `Are you sure you want to delete the motorcycle "${motor.name}"? All custom intervals and service history will be permanently deleted.`,
       async () => {
         if (user) {
           // Authenticated DB Delete
@@ -447,9 +447,9 @@ export default function Home() {
               return updated;
             });
             setLogs(prev => prev.filter(log => log.motorcycleId !== id));
-            showCustomAlert('Sukses', 'Sepeda motor berhasil dihapus.');
+            showCustomAlert('Success', 'Motorcycle successfully deleted.');
           } catch (err: any) {
-            showCustomAlert('Error', err.message || 'Gagal menghapus motor.');
+            showCustomAlert('Error', err.message || 'Failed to delete motorcycle.');
           }
         } else {
           // Guest Local Storage Delete
@@ -474,7 +474,7 @@ export default function Home() {
             localStorage.setItem('motoserv_guest_logs', JSON.stringify(updated));
             return updated;
           });
-          showCustomAlert('Sukses', 'Sepeda motor berhasil dihapus.');
+          showCustomAlert('Success', 'Motorcycle successfully deleted.');
         }
       },
       undefined,
@@ -500,7 +500,7 @@ export default function Home() {
         );
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal memperbarui odometer.');
+        showCustomAlert('Error', err.message || 'Failed to update odometer.');
         return false;
       }
     } else {
@@ -549,10 +549,10 @@ export default function Home() {
             return m;
           })
         );
-        showCustomAlert('Sukses', 'Komponen baru berhasil ditambahkan!');
+        showCustomAlert('Success', 'New component successfully added!');
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal menambahkan komponen baru.');
+        showCustomAlert('Error', err.message || 'Failed to add new component.');
         return false;
       }
     } else {
@@ -577,7 +577,7 @@ export default function Home() {
         localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updated));
         return updated;
       });
-      showCustomAlert('Sukses', 'Komponen baru berhasil ditambahkan secara lokal!');
+      showCustomAlert('Success', 'New component successfully added locally!');
       return true;
     }
   };
@@ -585,14 +585,14 @@ export default function Home() {
   // 10.c Subscribe push notifications handler
   const handleSubscribeNotifications = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      showCustomAlert('Info', 'Browser atau perangkat Anda tidak mendukung notifikasi push.');
+      showCustomAlert('Info', 'Your browser or device does not support push notifications.');
       return;
     }
 
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        showCustomAlert('Gagal', 'Izin notifikasi ditolak oleh pengguna.');
+        showCustomAlert('Failed', 'Notification permission was denied.');
         return;
       }
 
@@ -600,7 +600,7 @@ export default function Home() {
       
       const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!vapidPublicKey) {
-        showCustomAlert('Error', 'Kunci VAPID tidak terkonfigurasi.');
+        showCustomAlert('Error', 'VAPID keys are not configured.');
         return;
       }
 
@@ -626,7 +626,7 @@ export default function Home() {
       const subJson = subscription.toJSON();
       
       if (!subJson.endpoint || !subJson.keys || !subJson.keys.p256dh || !subJson.keys.auth) {
-        throw new Error('Format Subscription tidak valid.');
+        throw new Error('Invalid subscription format.');
       }
 
       const res = await fetch('/api/notifications/subscribe', {
@@ -646,11 +646,11 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      showCustomAlert('Sukses', 'Notifikasi HP berhasil diaktifkan!');
+      showCustomAlert('Success', 'Push notifications successfully enabled!');
       setIsPushEnabled(true);
     } catch (err: any) {
       console.error(err);
-      showCustomAlert('Error', err.message || 'Gagal mengaktifkan notifikasi.');
+      showCustomAlert('Error', err.message || 'Failed to enable push notifications.');
     }
   };
 
@@ -707,7 +707,7 @@ export default function Home() {
         );
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal mereset interval.');
+        showCustomAlert('Error', err.message || 'Failed to reset intervals.');
         return false;
       }
     } else {
@@ -753,7 +753,7 @@ export default function Home() {
         await fetchDataFromDB();
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal mencatat servis.');
+        showCustomAlert('Error', err.message || 'Failed to record service.');
         return false;
       }
     } else {
@@ -806,8 +806,8 @@ export default function Home() {
   // 14. Delete Service Log handler
   const handleDeleteLog = (id: string) => {
     showCustomConfirm(
-      'Hapus Catatan Servis',
-      'Apakah Anda yakin ingin menghapus catatan servis ini? Odometer servis terakhir komponen terkait akan otomatis disesuaikan.',
+      'Delete Service Log',
+      'Are you sure you want to delete this service log? The last service odometer for the affected components will automatically revert.',
       async () => {
         if (user) {
           // Authenticated DB Delete
@@ -818,9 +818,9 @@ export default function Home() {
 
             setLogs(prev => prev.filter(l => l.id !== id));
             await fetchDataFromDB();
-            showCustomAlert('Sukses', 'Catatan servis berhasil dihapus.');
+            showCustomAlert('Success', 'Service log successfully deleted.');
           } catch (err: any) {
-            showCustomAlert('Error', err.message || 'Gagal menghapus riwayat servis.');
+            showCustomAlert('Error', err.message || 'Failed to delete service history.');
           }
         } else {
           // Guest Local Storage Delete
@@ -864,7 +864,7 @@ export default function Home() {
             return remainingLogs;
           });
 
-          showCustomAlert('Sukses', 'Catatan servis berhasil dihapus.');
+          showCustomAlert('Success', 'Service log successfully deleted.');
         }
       },
       undefined,
@@ -892,7 +892,7 @@ export default function Home() {
 
           if (!res.ok) {
             const errData = await res.json();
-            throw new Error(errData.error || 'Gagal memperbarui catatan bahan bakar.');
+            throw new Error(errData.error || 'Failed to update fuel log.');
           }
 
           await fetchDataFromDB();
@@ -936,7 +936,7 @@ export default function Home() {
 
           if (!res.ok) {
             const errData = await res.json();
-            throw new Error(errData.error || 'Gagal menyimpan catatan bahan bakar.');
+            throw new Error(errData.error || 'Failed to save fuel log.');
           }
 
           await fetchDataFromDB();
@@ -966,7 +966,7 @@ export default function Home() {
       }
     } catch (err: any) {
       console.error('Save fuel log error:', err);
-      showCustomAlert('Error', err.message || 'Gagal menyimpan catatan bahan bakar.');
+      showCustomAlert('Error', err.message || 'Failed to save fuel log.');
       return false;
     }
   };
@@ -981,7 +981,7 @@ export default function Home() {
 
         if (!res.ok) {
           const errData = await res.json();
-          throw new Error(errData.error || 'Gagal menghapus catatan bahan bakar.');
+          throw new Error(errData.error || 'Failed to delete fuel log.');
         }
 
         await fetchDataFromDB();
@@ -994,7 +994,7 @@ export default function Home() {
       }
     } catch (err: any) {
       console.error('Delete fuel log error:', err);
-      showCustomAlert('Error', err.message || 'Gagal menghapus catatan bahan bakar.');
+      showCustomAlert('Error', err.message || 'Failed to delete fuel log.');
       return false;
     }
   };
@@ -1014,10 +1014,10 @@ export default function Home() {
         setActiveTab('dashboard');
         localStorage.removeItem('motoserv_active_motorcycle_id');
 
-        showCustomAlert('Sukses', 'Seluruh data di cloud berhasil direset!');
+        showCustomAlert('Success', 'All cloud data has been successfully reset!');
         return true;
       } catch (err: any) {
-        showCustomAlert('Error', err.message || 'Gagal mereset data cloud.');
+        showCustomAlert('Error', err.message || 'Failed to reset cloud data.');
         return false;
       }
     } else {
@@ -1030,7 +1030,7 @@ export default function Home() {
       localStorage.removeItem('motoserv_guest_logs');
       localStorage.removeItem('motoserv_guest_active_motor_id');
 
-      showCustomAlert('Sukses', 'Seluruh data local storage berhasil direset!');
+      showCustomAlert('Success', 'All local storage data has been successfully reset!');
       return true;
     }
   };
@@ -1040,7 +1040,7 @@ export default function Home() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'var(--bg-base)', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
         <div className="spinner-small" style={{ width: '32px', height: '32px', borderWidth: '3px' }}></div>
-        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Memeriksa sesi pengguna...</span>
+        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Verifying session...</span>
       </div>
     );
   }
@@ -1169,7 +1169,7 @@ export default function Home() {
         )}
 
         <footer className="app-footer">
-          <p>&copy; 2026 MotoServ. Dibuat oleh <a href="https://www.linkedin.com/in/amujahidakbar/" target="_blank" rel="noopener noreferrer">Mujahid Akbar</a>.</p>
+          <p>&copy; 2026 MotoServ. Developed by <a href="https://www.linkedin.com/in/amujahidakbar/" target="_blank" rel="noopener noreferrer">Mujahid Akbar</a>.</p>
         </footer>
       </main>
 
@@ -1264,7 +1264,7 @@ export default function Home() {
                   onClick={() => { setIsFabOpen(false); setIsUpdateOdoOpen(true); }}
                   aria-label="Update Odometer"
                 >
-                  <span className="mobile-fab-action-label">Update KM</span>
+                  <span className="mobile-fab-action-label">Update Odo</span>
                   <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-primary-dark)', color: 'var(--bg-base)' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
@@ -1275,9 +1275,9 @@ export default function Home() {
                 <button 
                   className="mobile-fab-action-item" 
                   onClick={() => { setIsFabOpen(false); setPreselectedCompForService(undefined); setIsAddServiceOpen(true); }}
-                  aria-label="Catat Servis"
+                  aria-label="Record Service"
                 >
-                  <span className="mobile-fab-action-label">Catat Servis</span>
+                  <span className="mobile-fab-action-label">Record Service</span>
                   <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-success)', color: 'var(--bg-base)' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -1288,9 +1288,9 @@ export default function Home() {
                 <button 
                   className="mobile-fab-action-item" 
                   onClick={() => { setIsFabOpen(false); setIsAddFuelOpen(true); }}
-                  aria-label="Catat BBM"
+                  aria-label="Record Fuel"
                 >
-                  <span className="mobile-fab-action-label">Catat BBM</span>
+                  <span className="mobile-fab-action-label">Record Fuel</span>
                   <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--bg-base)' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-13-7-13S5 10.7 5 15a7 7 0 0 0 7 7z"/>
@@ -1301,9 +1301,9 @@ export default function Home() {
                 <button 
                   className="mobile-fab-action-item" 
                   onClick={() => { setIsFabOpen(false); setIsAddMotorOpen(true); }}
-                  aria-label="Tambah Motor"
+                  aria-label="Add Motorcycle"
                 >
-                  <span className="mobile-fab-action-label">Tambah Motor</span>
+                  <span className="mobile-fab-action-label">Add Motorcycle</span>
                   <div className="mobile-fab-action-icon" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--bg-base)' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="6" cy="18" r="3"/>
@@ -1320,7 +1320,7 @@ export default function Home() {
           <button 
             className={`mobile-fab-trigger ${isFabOpen ? 'open' : ''}`} 
             onClick={() => setIsFabOpen(!isFabOpen)}
-            aria-label="Menu Aksi Cepat"
+            aria-label="Quick Actions"
             aria-expanded={isFabOpen}
             style={{ color: 'var(--bg-base)' }}
           >

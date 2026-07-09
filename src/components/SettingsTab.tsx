@@ -48,7 +48,7 @@ export default function SettingsTab({
   const [loading, setLoading] = useState(false);
 
   // Feedback states
-  const [feedbackType, setFeedbackType] = useState('Bug / Kendala');
+  const [feedbackType, setFeedbackType] = useState('Bug / Issue');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackEmail, setFeedbackEmail] = useState('');
   const [feedbackName, setFeedbackName] = useState('');
@@ -120,12 +120,12 @@ export default function SettingsTab({
     return (
       <section id="tab-pengaturan" className="tab-content active">
         <div className="section-header">
-          <h2>Pengaturan Batas Servis</h2>
-          <p className="section-desc">Atur interval kilometer ideal untuk penggantian komponen motor Anda.</p>
+          <h2>Service Limit Settings</h2>
+          <p className="section-desc">Configure the ideal mileage intervals for replacing your motorcycle parts.</p>
         </div>
         <div className="empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 1.5rem' }}>
-          <h3>Belum Ada Kendaraan Aktif</h3>
-          <p>Pilih atau tambahkan sepeda motor terlebih dahulu untuk mengonfigurasi batas servis.</p>
+          <h3>No Active Motorcycle</h3>
+          <p>Please select or add a motorcycle first to configure service limits.</p>
         </div>
       </section>
     );
@@ -145,7 +145,7 @@ export default function SettingsTab({
     // Validate inputs
     const invalidComps = Object.entries(formValues).filter(([_, val]) => val <= 100);
     if (invalidComps.length > 0) {
-      showAlert('Input Tidak Valid', 'Interval servis minimal harus lebih besar dari 100 KM!');
+      showAlert('Invalid Input', 'Service intervals must be greater than 100 KM!');
       return;
     }
 
@@ -159,8 +159,8 @@ export default function SettingsTab({
 
   const handleResetClick = async () => {
     showConfirm(
-      'Reset Interval Ke Default',
-      'Apakah Anda yakin ingin mengembalikan seluruh interval komponen motor ini ke standar default rekomendasi pabrikan?',
+      'Reset Intervals to Default',
+      'Are you sure you want to revert all part intervals of this motorcycle to manufacturer standards?',
       async () => {
         setLoading(true);
         const success = await onResetIntervals();
@@ -174,12 +174,12 @@ export default function SettingsTab({
 
   const handleFactoryResetClick = async () => {
     showConfirm(
-      'Reset Semua Data',
-      'PERINGATAN: Apakah Anda yakin ingin menghapus seluruh data motor, catatan servis, dan interval kustom pada akun Anda? Tindakan ini tidak dapat dibatalkan.',
+      'Factory Reset Data',
+      'WARNING: Are you sure you want to delete all motorcycle data, service history, and custom intervals? This action cannot be undone.',
       () => {
         showConfirm(
-          'Konfirmasi Akhir',
-          'KONFIRMASI KEDUA: Apakah Anda benar-benar yakin? Semua data akan hilang selamanya.',
+          'Final Confirmation',
+          'SECOND CONFIRMATION: Are you absolutely sure? All data will be lost forever.',
           async () => {
             setLoading(true);
             await onFactoryResetData();
@@ -197,7 +197,7 @@ export default function SettingsTab({
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (feedbackMessage.trim().length < 10) {
-      showAlert('Error', 'Pesan masukan minimal harus 10 karakter!');
+      showAlert('Error', 'Feedback message must be at least 10 characters!');
       return;
     }
 
@@ -215,7 +215,7 @@ export default function SettingsTab({
       });
 
       if (res.ok) {
-        showAlert('Sukses', 'Masukan Anda berhasil dikirim. Terima kasih atas kontribusi Anda!');
+        showAlert('Success', 'Your feedback has been successfully submitted. Thank you for your contribution!');
         setFeedbackMessage('');
         if (!user) {
           setFeedbackEmail('');
@@ -228,10 +228,10 @@ export default function SettingsTab({
         }
       } else {
         const data = await res.json();
-        showAlert('Gagal', data.error || 'Gagal mengirimkan masukan.');
+        showAlert('Failed', data.error || 'Failed to submit feedback.');
       }
     } catch (err) {
-      showAlert('Error', 'Terjadi kesalahan sistem saat mengirim masukan.');
+      showAlert('Error', 'A system error occurred while sending feedback.');
     } finally {
       setSendingFeedback(false);
     }
@@ -239,8 +239,8 @@ export default function SettingsTab({
 
   const handleDeleteFeedback = async (id: number) => {
     showConfirm(
-      'Hapus Masukan',
-      'Apakah Anda yakin ingin menghapus masukan ini?',
+      'Delete Feedback',
+      'Are you sure you want to delete this feedback?',
       async () => {
         try {
           const res = await fetch(`/api/admin/feedbacks/${id}`, {
@@ -248,12 +248,12 @@ export default function SettingsTab({
           });
           if (res.ok) {
             setFeedbacks(prev => prev.filter(f => f.id !== id));
-            showAlert('Sukses', 'Masukan berhasil dihapus.');
+            showAlert('Success', 'Feedback successfully deleted.');
           } else {
-            showAlert('Gagal', 'Gagal menghapus masukan.');
+            showAlert('Failed', 'Failed to delete feedback.');
           }
         } catch (e) {
-          showAlert('Error', 'Terjadi kesalahan sistem.');
+          showAlert('Error', 'System error occurred.');
         }
       }
     );
@@ -268,14 +268,14 @@ export default function SettingsTab({
   return (
     <section id="tab-pengaturan" className="tab-content active">
       <div className="section-header">
-        <h2>Pengaturan Batas Servis</h2>
-        <p className="section-desc">Atur interval kilometer ideal untuk penggantian komponen motor Anda.</p>
+        <h2>Service Limit Settings</h2>
+        <p className="section-desc">Configure the ideal mileage intervals for replacing your motorcycle parts.</p>
       </div>
 
       <div className="settings-card">
         <div className="settings-card-header">
-          <h3>Sesuaikan Interval Jarak Tempuh (KM)</h3>
-          <span className="active-motor-tag" id="settings-motor-tag">Motor Aktif: {activeMotor.name} ({activeMotor.type})</span>
+          <h3>Customize Mileage Intervals (KM)</h3>
+          <span className="active-motor-tag" id="settings-motor-tag" style={{ textTransform: 'capitalize' }}>Active Bike: {activeMotor.name} ({activeMotor.type})</span>
         </div>
 
         {!isEditing ? (
@@ -303,7 +303,7 @@ export default function SettingsTab({
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
-                <span>Ubah Interval</span>
+                <span>Change Intervals</span>
               </button>
               
               <button 
@@ -315,7 +315,7 @@ export default function SettingsTab({
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <span>Tambah Komponen</span>
+                <span>Add Component</span>
               </button>
             </div>
           </div>
@@ -347,7 +347,7 @@ export default function SettingsTab({
                 onClick={handleResetClick}
                 disabled={loading}
               >
-                Reset ke Default Pabrikan
+                Reset to Manufacturer Defaults
               </button>
               <button 
                 type="button" 
@@ -356,14 +356,14 @@ export default function SettingsTab({
                 disabled={loading}
                 style={{ marginLeft: 'auto' }}
               >
-                Batal
+                Cancel
               </button>
               <button 
                 type="submit" 
                 className="btn btn-primary"
                 disabled={loading}
               >
-                {loading ? 'Menyimpan...' : 'Simpan Pengaturan'}
+                {loading ? 'Saving...' : 'Save Settings'}
               </button>
             </div>
           </form>
@@ -373,7 +373,7 @@ export default function SettingsTab({
       {/* Cloud Backup Settings */}
       <div className="settings-card" style={{ marginTop: '1.5rem' }}>
         <div className="settings-card-header">
-          <h3>Pencadangan Cloud (Database MySQL)</h3>
+          <h3>Cloud Backup (MySQL Database)</h3>
           <span 
             className={`sync-badge ${user ? 'status-connected' : 'status-disconnected'}`}
             style={{ 
@@ -385,14 +385,14 @@ export default function SettingsTab({
               letterSpacing: '0.5px' 
             }}
           >
-            {user ? 'Aktif' : 'Non-aktif'}
+            {user ? 'Enabled' : 'Disabled'}
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
           {user ? (
             <>
               <p className="text-secondary" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
-                Akun Anda terhubung dengan email: <strong>{user.email}</strong>. Data motor dan riwayat servis Anda otomatis tersinkronisasi dan dicadangkan ke database MySQL server.
+                Your account is connected to: <strong>{user.email}</strong>. Your motorcycle details and service history are automatically synced to our secure cloud database.
               </p>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button 
@@ -401,14 +401,14 @@ export default function SettingsTab({
                   disabled
                   style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem' }}
                 >
-                  Pencadangan Otomatis Aktif
+                  Automatic Cloud Backup Active
                 </button>
               </div>
             </>
           ) : (
             <>
               <p className="text-secondary" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
-                Anda saat ini menggunakan <strong>Sesi Lokal (Guest)</strong>. Data hanya disimpan di browser Anda saat ini. Masuk atau daftarkan akun untuk mengaktifkan pencadangan otomatis ke cloud MySQL.
+                You are currently using a <strong>Local Session (Guest Mode)</strong>. Data is only saved in your current browser. Sign in or register to enable real-time cloud sync.
               </p>
               <button 
                 type="button" 
@@ -416,7 +416,7 @@ export default function SettingsTab({
                 onClick={onOpenAuthModal}
                 style={{ alignSelf: 'flex-start' }}
               >
-                Login / Register Akun Backup
+                Sign In / Register Backup Account
               </button>
             </>
           )}
@@ -426,7 +426,7 @@ export default function SettingsTab({
       {/* Mobile Push Notifications Settings */}
       <div className="settings-card" style={{ marginTop: '1.5rem' }}>
         <div className="settings-card-header">
-          <h3>Notifikasi HP Pengguna</h3>
+          <h3>Mobile Push Notifications</h3>
           <span 
             className={`sync-badge ${isPushEnabled && user ? 'status-connected' : 'status-disconnected'}`}
             style={{ 
@@ -438,16 +438,16 @@ export default function SettingsTab({
               letterSpacing: '0.5px' 
             }}
           >
-            {isPushEnabled && user ? 'Aktif' : 'Non-aktif'}
+            {isPushEnabled && user ? 'Enabled' : 'Disabled'}
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
           <p className="text-secondary" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
-            Dapatkan notifikasi sistem secara instan ke HP Anda jika ada komponen motor yang memerlukan servis (misal: oli mesin melewati batas jarak).
+            Get instant push notifications sent directly to your phone when components require service (e.g. Engine Oil limit exceeded).
           </p>
           {!user ? (
             <div style={{ background: 'rgba(255, 230, 230, 0.03)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Silakan login terlebih dahulu untuk mendaftarkan perangkat Anda dengan push notifications cloud.
+              Please sign in first to register your device for cloud push notifications.
             </div>
           ) : isPushEnabled ? (
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -457,7 +457,7 @@ export default function SettingsTab({
                 disabled
                 style={{ fontSize: '0.85rem', padding: '0.45rem 1rem', opacity: 0.8 }}
               >
-                Notifikasi HP Terdaftar
+                Device Registered
               </button>
               <button 
                 type="button" 
@@ -465,7 +465,7 @@ export default function SettingsTab({
                 onClick={onSubscribeNotifications}
                 style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
               >
-                Daftarkan Ulang Perangkat
+                Re-register Device
               </button>
             </div>
           ) : (
@@ -475,7 +475,7 @@ export default function SettingsTab({
               onClick={onSubscribeNotifications}
               style={{ alignSelf: 'flex-start' }}
             >
-              Aktifkan Notifikasi HP Saya
+              Enable Notifications on My Device
             </button>
           )}
         </div>
@@ -484,37 +484,37 @@ export default function SettingsTab({
       {/* Kirim Masukan Section */}
       <div className="settings-card" style={{ marginTop: '1.5rem' }}>
         <div className="settings-card-header">
-          <h3>Kirim Masukan & Saran</h3>
+          <h3>Submit Feedback & Suggestions</h3>
         </div>
         <form onSubmit={handleFeedbackSubmit} style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <p className="text-secondary" style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
-            Punya ide fitur baru, kendala bug, atau saran desain? Kirimkan kepada kami untuk membantu pengembangan MotoServ!
+            Have new feature ideas, bug reports, or design suggestions? Send them to help us improve MotoServ!
           </p>
           
           <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Kategori</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</label>
               <select
                 className="custom-select"
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
                 style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)' }}
               >
-                <option value="Bug / Kendala">Bug / Kendala</option>
-                <option value="Fitur Baru">Fitur Baru</option>
-                <option value="Saran Desain">Saran Desain</option>
-                <option value="Lainnya">Lainnya</option>
+                <option value="Bug / Issue">Bug / Issue</option>
+                <option value="New Feature">New Feature</option>
+                <option value="Design Suggestion">Design Suggestion</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
             {!user && (
               <>
                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Nama Anda</label>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Your Name</label>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Masukkan nama Anda"
+                    placeholder="Enter your name"
                     value={feedbackName}
                     onChange={(e) => setFeedbackName(e.target.value)}
                     required
@@ -522,7 +522,7 @@ export default function SettingsTab({
                   />
                 </div>
                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Email Anda</label>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Your Email</label>
                   <input
                     type="email"
                     className="form-control"
@@ -538,10 +538,10 @@ export default function SettingsTab({
           </div>
 
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Pesan Masukan</label>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Feedback Message</label>
             <textarea
               className="form-control"
-              placeholder="Tulis saran, detail kendala, atau masukan Anda di sini (minimal 10 karakter)..."
+              placeholder="Write your suggestions, bug details, or feedback here (minimum 10 characters)..."
               rows={4}
               value={feedbackMessage}
               onChange={(e) => setFeedbackMessage(e.target.value)}
@@ -556,7 +556,7 @@ export default function SettingsTab({
             disabled={sendingFeedback}
             style={{ alignSelf: 'flex-start' }}
           >
-            {sendingFeedback ? 'Mengirim...' : 'Kirim Masukan'}
+            {sendingFeedback ? 'Sending...' : 'Send Feedback'}
           </button>
         </form>
       </div>
@@ -565,14 +565,14 @@ export default function SettingsTab({
       {isAdmin && (
         <div className="settings-card" style={{ marginTop: '1.5rem', border: '1px solid var(--color-primary)' }}>
           <div className="settings-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ color: 'var(--color-primary)' }}>Panel Admin: Ringkasan & Masukan</h3>
+            <h3 style={{ color: 'var(--color-primary)' }}>Admin Console: Summary & Feedbacks</h3>
             <button 
               className="btn btn-secondary btn-sm"
               onClick={() => { fetchFeedbacks(); fetchAdminStats(); }}
               disabled={loadingFeedbacks}
               style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
             >
-              {loadingFeedbacks ? 'Memuat...' : 'Refresh'}
+              {loadingFeedbacks ? 'Loading...' : 'Refresh'}
             </button>
           </div>
           
@@ -580,31 +580,31 @@ export default function SettingsTab({
             {/* Admin Metrics Row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--color-primary)', fontWeight: 600, textTransform: 'uppercase' }}>Pengguna</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--color-primary)', fontWeight: 600, textTransform: 'uppercase' }}>Users</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {adminStats !== null ? adminStats.totalUsers.toLocaleString('id-ID') : '...'}
                 </div>
               </div>
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Motor</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Bikes</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {adminStats !== null ? adminStats.totalMotorcycles.toLocaleString('id-ID') : '...'}
                 </div>
               </div>
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Log Servis</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Service Logs</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {adminStats !== null ? adminStats.totalServiceLogs.toLocaleString('id-ID') : '...'}
                 </div>
               </div>
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Log BBM</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Fuel Logs</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {adminStats !== null ? adminStats.totalFuelLogs.toLocaleString('id-ID') : '...'}
                 </div>
               </div>
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Saran</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Feedbacks</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
                   {feedbacks.length}
                 </div>
@@ -614,12 +614,12 @@ export default function SettingsTab({
             {/* Motorcycle Types Breakdown */}
             {adminStats?.motorcycleTypes && adminStats.motorcycleTypes.length > 0 && (
               <div style={{ padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Proporsi Tipe Transmisi Motor Terdaftar:</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Registered Motorcycle Transmission Distribution:</div>
                 <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                   {adminStats.motorcycleTypes.map(t => (
                     <div key={t.type} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <span className="badge" style={{ textTransform: 'capitalize', padding: '0.15rem 0.4rem', fontSize: '0.7rem' }}>{t.type}</span>
-                      <strong>{t.count} unit</strong>
+                      <strong>{t.count} unit(s)</strong>
                     </div>
                   ))}
                 </div>
@@ -629,7 +629,7 @@ export default function SettingsTab({
             <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.25rem 0' }}></div>
             {feedbacks.length === 0 ? (
               <p className="text-secondary" style={{ fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center', padding: '1rem' }}>
-                Belum ada masukan dari pengguna.
+                No feedback received from users yet.
               </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
@@ -644,8 +644,8 @@ export default function SettingsTab({
                         fontSize: '0.7rem', 
                         padding: '0.15rem 0.4rem', 
                         borderRadius: '4px', 
-                        background: fb.type === 'Bug / Kendala' ? 'rgba(239, 68, 68, 0.1)' : fb.type === 'Fitur Baru' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                        color: fb.type === 'Bug / Kendala' ? 'var(--color-danger)' : fb.type === 'Fitur Baru' ? 'var(--color-success)' : 'var(--text-secondary)',
+                        background: fb.type.includes('Bug') ? 'rgba(239, 68, 68, 0.1)' : fb.type.includes('New') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                        color: fb.type.includes('Bug') ? 'var(--color-danger)' : fb.type.includes('New') ? 'var(--color-success)' : 'var(--text-secondary)',
                         fontWeight: 600
                       }}>
                         {fb.type}
@@ -656,14 +656,14 @@ export default function SettingsTab({
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        {new Date(fb.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {new Date(fb.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => handleDeleteFeedback(fb.id)}
                         style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}
                       >
-                        Hapus
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -675,15 +675,15 @@ export default function SettingsTab({
       )}
 
       <div className="danger-zone-card" style={{ marginTop: '1.5rem' }}>
-        <h3>Zona Bahaya</h3>
-        <p>Mereset semua data aplikasi akan menghapus seluruh motor, riwayat servis, dan pengaturan yang tersimpan.</p>
+        <h3>Danger Zone</h3>
+        <p>Resetting application data will permanently delete all motorcycles, logs, and configurations.</p>
         <button 
           className="btn btn-danger" 
           id="btn-factory-reset"
           disabled={loading}
           onClick={handleFactoryResetClick}
         >
-          Hapus Semua Data Aplikasi
+          Factory Reset App Data
         </button>
       </div>
     </section>

@@ -22,7 +22,7 @@ export default function CustomDialog({
   onConfirm,
   onCancel,
   confirmText = 'OK',
-  cancelText = 'Batal',
+  cancelText = 'Cancel',
   isDanger = false
 }: CustomDialogProps) {
   if (!isOpen) return null;

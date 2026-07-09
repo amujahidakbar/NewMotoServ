@@ -1,37 +1,37 @@
 export const DEFAULT_INTERVALS = {
   matic: {
-    "Oli Mesin": 2500,
-    "Busi": 8000,
-    "Oli Transmisi": 8000,
-    "Ban Depan": 20000,
-    "Ban Belakang": 20000,
+    "Engine Oil": 2500,
+    "Spark Plug": 8000,
+    "Gear Oil": 8000,
+    "Front Tyre": 20000,
+    "Rear Tyre": 20000,
     "Drive Belt": 20000,
     "Coolant": 12000,
-    "Kampas Rem": 15000,
-    "Filter Udara": 12000,
-    "Aki": 20000
+    "Brake Pads": 15000,
+    "Air Filter": 12000,
+    "Battery": 20000
   },
   manual: {
-    "Oli Mesin": 2500,
-    "Busi": 8000,
-    "Ban Depan": 20000,
-    "Ban Belakang": 20000,
-    "Rantai": 15000,
+    "Engine Oil": 2500,
+    "Spark Plug": 8000,
+    "Front Tyre": 20000,
+    "Rear Tyre": 20000,
+    "Chain": 15000,
     "Coolant": 12000,
-    "Kampas Rem": 15000,
-    "Filter Udara": 12000,
-    "Aki": 20000
+    "Brake Pads": 15000,
+    "Air Filter": 12000,
+    "Battery": 20000
   },
   kopling: {
-    "Oli Mesin": 2500,
-    "Busi": 8000,
-    "Ban Depan": 20000,
-    "Ban Belakang": 20000,
-    "Rantai": 15000,
+    "Engine Oil": 2500,
+    "Spark Plug": 8000,
+    "Front Tyre": 20000,
+    "Rear Tyre": 20000,
+    "Chain": 15000,
     "Coolant": 12000,
-    "Kampas Rem": 15000,
-    "Filter Udara": 12000,
-    "Aki": 20000
+    "Brake Pads": 15000,
+    "Air Filter": 12000,
+    "Battery": 20000
   }
 } as const;
 

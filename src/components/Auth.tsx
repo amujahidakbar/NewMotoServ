@@ -36,12 +36,12 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Terjadi kesalahan saat memproses permintaan Anda.');
+        throw new Error(data.error || 'An error occurred while processing your request.');
       }
 
       onAuthSuccess(data.user);
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan koneksi.');
+      setError(err.message || 'A connection error occurred.');
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             </svg>
           </div>
           <h2>Moto<span>Serv</span></h2>
-          <p>{mode === 'login' ? 'Masuk ke garasi motor Anda' : 'Buat akun garasi baru Anda'}</p>
+          <p>{mode === 'login' ? 'Sign in to your motorcycle garage' : 'Create your new garage account'}</p>
         </div>
 
         {error && (
@@ -75,11 +75,11 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {mode === 'register' && (
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Nama Lengkap</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Full Name</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Masukkan nama Anda"
+                placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -89,11 +89,11 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
           )}
 
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Alamat Email</label>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Email Address</label>
             <input
               type="email"
               className="form-control"
-              placeholder="nama@email.com"
+              placeholder="name@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -102,7 +102,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
           </div>
 
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Kata Sandi</label>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Password</label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -130,7 +130,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
                   justifyContent: 'center',
                   zIndex: 2
                 }}
-                title={showPassword ? 'Sembunyikan Kata Sandi' : 'Tampilkan Kata Sandi'}
+                title={showPassword ? 'Hide Password' : 'Show Password'}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -155,10 +155,10 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             {loading ? (
               <>
                 <span className="spinner-small" style={{ width: '16px', height: '16px' }}></span>
-                <span>Memproses...</span>
+                <span>Processing...</span>
               </>
             ) : (
-              <span>{mode === 'login' ? 'Masuk' : 'Daftar Akun'}</span>
+              <span>{mode === 'login' ? 'Sign In' : 'Register'}</span>
             )}
           </button>
         </form>
@@ -166,13 +166,13 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         <div className="auth-footer">
           {mode === 'login' ? (
             <>
-              Belum punya akun?
-              <button className="auth-link" onClick={() => { setMode('register'); setError(null); }}>Daftar di sini</button>
+              Don't have an account?
+              <button className="auth-link" onClick={() => { setMode('register'); setError(null); }}>Register here</button>
             </>
           ) : (
             <>
-              Sudah punya akun?
-              <button className="auth-link" onClick={() => { setMode('login'); setError(null); }}>Masuk di sini</button>
+              Already have an account?
+              <button className="auth-link" onClick={() => { setMode('login'); setError(null); }}>Sign in here</button>
             </>
           )}
         </div>

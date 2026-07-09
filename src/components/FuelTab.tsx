@@ -40,9 +40,9 @@ function formatDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
   if (year && month && day) {
     const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return d.toLocaleDateString('id-ID', options);
+    return d.toLocaleDateString('en-US', options);
   }
-  return new Date(dateString).toLocaleDateString('id-ID', options);
+  return new Date(dateString).toLocaleDateString('en-US', options);
 }
 
 export default function FuelTab({
@@ -61,12 +61,12 @@ export default function FuelTab({
     return (
       <section id="tab-bbm" className="tab-content active">
         <div className="section-header">
-          <h2>Konsumsi Bahan Bakar (BBM)</h2>
-          <p className="section-desc">Pantau efisiensi konsumsi bahan bakar dan pengeluaran BBM kendaraan Anda.</p>
+          <h2>Fuel Efficiency Tracker</h2>
+          <p className="section-desc">Monitor fuel economy and gas expense records for your vehicles.</p>
         </div>
         <div className="empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 1.5rem' }}>
-          <h3>Belum Ada Kendaraan Aktif</h3>
-          <p>Pilih atau tambahkan sepeda motor terlebih dahulu untuk mengelola catatan BBM.</p>
+          <h3>No Active Motorcycle</h3>
+          <p>Please select or add a motorcycle first to manage fuel logs.</p>
         </div>
       </section>
     );
@@ -174,13 +174,13 @@ export default function FuelTab({
 
   const handleDeleteClick = (id: string, date: string, odo: number) => {
     showConfirm(
-      'Hapus Catatan BBM',
-      `Apakah Anda yakin ingin menghapus catatan BBM tanggal ${date} pada odometer ${odo.toLocaleString('id-ID')} KM?`,
+      'Delete Fuel Log',
+      `Are you sure you want to delete the fuel log from ${date} at odometer ${odo.toLocaleString('id-ID')} KM?`,
       () => {
         onDeleteFuelLog(id);
       },
       undefined,
-      { confirmText: 'Hapus', cancelText: 'Batal', isDanger: true }
+      { confirmText: 'Delete', cancelText: 'Cancel', isDanger: true }
     );
   };
 
@@ -188,56 +188,56 @@ export default function FuelTab({
     <section id="tab-bbm" className="tab-content active">
       <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <div>
-          <h2>Konsumsi Bahan Bakar (BBM)</h2>
-          <p className="section-desc">Pantau efisiensi konsumsi bahan bakar dan pengeluaran BBM kendaraan Anda.</p>
+          <h2>Fuel Efficiency Tracker</h2>
+          <p className="section-desc">Monitor fuel economy and gas expense records for your vehicles.</p>
         </div>
         <button className="btn btn-primary btn-sm btn-icon" onClick={onOpenAddFuelModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>Catat BBM</span>
+          <span>Record Fuel</span>
         </button>
       </div>
 
       {/* Stats Cards Grid */}
       <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Rata-rata Konsumsi</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Average Consumption</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
             {chronoLogs.length >= 2 ? `${avgKmL.toFixed(1)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>KM/L</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `${(avgLitersKm).toFixed(3)} L / KM` : 'Butuh minimal 2 catatan'}
+            {chronoLogs.length >= 2 ? `${(avgLitersKm).toFixed(3)} L / KM` : 'Requires at least 2 logs'}
           </div>
         </div>
 
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Biaya Per Kilometer</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Cost Per Kilometer</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-warning)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `Rp ${Math.round(avgCostKm).toLocaleString('id-ID')}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
+            {chronoLogs.length >= 2 ? `IDR ${Math.round(avgCostKm).toLocaleString('id-ID')}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `Jarak ukur: ${totalDistance.toLocaleString('id-ID')} KM` : 'Butuh minimal 2 catatan'}
+            {chronoLogs.length >= 2 ? `Tracked distance: ${totalDistance.toLocaleString('id-ID')} KM` : 'Requires at least 2 logs'}
           </div>
         </div>
 
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Pengeluaran</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Fuel Expenses</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
-            Rp {totalCost.toLocaleString('id-ID')}
+            IDR {totalCost.toLocaleString('id-ID')}
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Total volume: {totalLiters.toFixed(1)} Liter ({chronoLogs.length} kali isi)
+            Total volume: {totalLiters.toFixed(1)} Liters ({chronoLogs.length} fill-ups)
           </div>
         </div>
 
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Konsumsi BBM Harian</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Daily Fuel Consumption</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
-            {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/Hari</small>
+            {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/Day</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length > 0 ? `Rp ${Math.round(dailyCost).toLocaleString('id-ID')} / hari (${totalDays} hari)` : 'Belum ada data'}
+            {chronoLogs.length > 0 ? `IDR ${Math.round(dailyCost).toLocaleString('id-ID')} / day (${totalDays} days)` : 'No data available'}
           </div>
         </div>
       </div>
@@ -245,21 +245,21 @@ export default function FuelTab({
       {/* Fuel Log List Table */}
       <div className="card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Riwayat Pengisian Bahan Bakar</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Fuel Log History</h3>
           
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Filter Rentang:</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Date Filter:</label>
             <select 
               className="custom-select custom-select-sm"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as any)}
               style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}
             >
-              <option value="all">Semua Waktu</option>
-              <option value="30">30 Hari Terakhir</option>
-              <option value="90">90 Hari Terakhir</option>
-              <option value="year">Tahun Ini</option>
-              <option value="custom">Kustom (Pilih Tanggal)</option>
+              <option value="all">All Time</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom Range</option>
             </select>
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function FuelTab({
         {timeRange === 'custom' && (
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', marginBottom: '1.25rem', animation: 'fadeIn 0.2s ease-out' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Mulai</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Start Date</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -277,7 +277,7 @@ export default function FuelTab({
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Selesai</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>End Date</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -292,8 +292,8 @@ export default function FuelTab({
         {filteredMotorLogs.length === 0 ? (
           <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             {timeRange === 'all' 
-              ? 'Belum ada catatan pengisian BBM. Klik tombol "Catat BBM" di atas untuk menambah data.'
-              : 'Tidak ditemukan catatan BBM untuk rentang waktu terpilih.'
+              ? 'No fuel logs recorded yet. Click "Record Fuel" above to log your first fill-up.'
+              : 'No fuel logs found for the selected date range.'
             }
           </div>
         ) : (
@@ -301,13 +301,13 @@ export default function FuelTab({
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 600 }}>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Tanggal</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Date</th>
                   <th style={{ padding: '0.75rem 0.5rem' }}>Odometer</th>
                   <th style={{ padding: '0.75rem 0.5rem' }}>Volume</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Total Biaya</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Harga/Liter</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Konsumsi per KM</th>
-                  <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Aksi</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Total Cost</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Price/Liter</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Consumption per KM</th>
+                  <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -345,10 +345,10 @@ export default function FuelTab({
                         {log.liters.toFixed(2)} L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 500 }}>
-                        Rp {log.price.toLocaleString('id-ID')}
+                        IDR {log.price.toLocaleString('id-ID')}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        Rp {Math.round(pricePerLiter).toLocaleString('id-ID')}/L
+                        IDR {Math.round(pricePerLiter).toLocaleString('id-ID')}/L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem' }}>
                         {hasTripStats ? (
@@ -357,12 +357,12 @@ export default function FuelTab({
                               {tripKmL.toFixed(1)} KM/L
                             </span>
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                              Rp {Math.round(tripCostKm).toLocaleString('id-ID')}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
+                              IDR {Math.round(tripCostKm).toLocaleString('id-ID')}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
                             </span>
                           </div>
                         ) : (
                           <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                            Data awal / Odo turun
+                            Initial / Odo correction
                           </span>
                         )}
                       </td>
@@ -370,7 +370,7 @@ export default function FuelTab({
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                           <button
                             className="btn btn-secondary btn-icon-only"
-                            title="Edit Catatan"
+                            title="Edit Log"
                             onClick={() => onOpenEditFuelModal(log)}
                             style={{
                               width: '28px',
@@ -387,7 +387,7 @@ export default function FuelTab({
                           </button>
                           <button
                             className="btn btn-secondary btn-icon-only"
-                            title="Hapus Catatan"
+                            title="Delete Log"
                             onClick={() => handleDeleteClick(log.id, log.date, log.odometer)}
                             style={{
                               width: '28px',

@@ -21,18 +21,18 @@ interface DashboardTabProps {
   onOpenAddServiceModal: (preselectedComponent?: string) => void;
 }
 
-// Helper to render component icons
+// Helper to render component icons (supports English and legacy Indonesian component names)
 export function getComponentIcon(name: string) {
   const cleanName = name.toLowerCase();
   
-  if (cleanName.includes('oli mesin')) {
+  if (cleanName.includes('oli mesin') || cleanName.includes('engine oil')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z"/>
       </svg>
     );
   }
-  if (cleanName.includes('oli transmisi') || cleanName.includes('gardan')) {
+  if (cleanName.includes('oli transmisi') || cleanName.includes('gardan') || cleanName.includes('gear oil') || cleanName.includes('transmission oil')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z"/>
@@ -40,7 +40,7 @@ export function getComponentIcon(name: string) {
       </svg>
     );
   }
-  if (cleanName.includes('busi')) {
+  if (cleanName.includes('busi') || cleanName.includes('spark plug')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
@@ -55,7 +55,7 @@ export function getComponentIcon(name: string) {
       </svg>
     );
   }
-  if (cleanName.includes('belt') || cleanName.includes('v-belt')) {
+  if (cleanName.includes('belt') || cleanName.includes('v-belt') || cleanName.includes('drive belt')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <ellipse cx="12" cy="12" rx="9" ry="5"/>
@@ -63,7 +63,7 @@ export function getComponentIcon(name: string) {
       </svg>
     );
   }
-  if (cleanName.includes('rantai') || cleanName.includes('gir')) {
+  if (cleanName.includes('rantai') || cleanName.includes('gir') || cleanName.includes('chain')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="3" y="10" width="4" height="4" rx="1"/>
@@ -73,21 +73,21 @@ export function getComponentIcon(name: string) {
       </svg>
     );
   }
-  if (cleanName.includes('rem') || cleanName.includes('pad')) {
+  if (cleanName.includes('rem') || cleanName.includes('pad') || cleanName.includes('brake')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M4 10a8 8 0 0 1 16 0M4 14a8 8 0 0 0 16 0"/><line x1="2" y1="12" x2="22" y2="12"/>
       </svg>
     );
   }
-  if (cleanName.includes('ban depan')) {
+  if (cleanName.includes('ban depan') || cleanName.includes('front tyre')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M12 15v7M2 12h7M15 12h7"/>
       </svg>
     );
   }
-  if (cleanName.includes('ban belakang') || cleanName.includes('ban')) {
+  if (cleanName.includes('ban belakang') || cleanName.includes('ban') || cleanName.includes('rear tyre') || cleanName.includes('tyre')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M12 15v7M2 12h7M15 12h7"/>
@@ -101,7 +101,7 @@ export function getComponentIcon(name: string) {
       </svg>
     );
   }
-  if (cleanName.includes('aki') || cleanName.includes('baterai') || cleanName.includes('accu')) {
+  if (cleanName.includes('aki') || cleanName.includes('baterai') || cleanName.includes('accu') || cleanName.includes('battery')) {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="7" width="20" height="12" rx="2" ry="2"/><line x1="6" y1="3" x2="6" y2="7"/><line x1="18" y1="3" x2="18" y2="7"/><line x1="8" y1="13" x2="12" y2="13"/><line x1="10" y1="11" x2="10" y2="15"/><line x1="14" y1="13" x2="16" y2="13"/>
@@ -128,8 +128,8 @@ export default function DashboardTab({
       <section id="tab-dashboard" className="tab-content active">
         <div className="section-header">
           <div>
-            <h2>Dashboard Pemantauan</h2>
-            <p className="section-desc">Status kesehatan suku cadang sepeda motor Anda saat ini.</p>
+            <h2>Monitoring Dashboard</h2>
+            <p className="section-desc">Real-time health status of your motorcycle components.</p>
           </div>
         </div>
 
@@ -161,9 +161,9 @@ export default function DashboardTab({
             </svg>
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Belum Ada Kendaraan di Garasi</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No Vehicles in Your Garage</h3>
             <p className="text-secondary" style={{ fontSize: '0.95rem', maxWidth: '400px', margin: '0 auto', lineHeight: 1.5 }}>
-              Tambahkan sepeda motor pertama Anda untuk mulai mencatat odometer dan memantau status kesehatan suku cadangnya secara otomatis.
+              Add your first motorcycle to start tracking your odometer and monitoring component health automatically.
             </p>
           </div>
           <button 
@@ -176,7 +176,7 @@ export default function DashboardTab({
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span>Tambah Motor Pertama</span>
+            <span>Add First Motorcycle</span>
           </button>
         </div>
       </section>
@@ -212,19 +212,19 @@ export default function DashboardTab({
   // Determine overall status indicators
   let strokeColor = 'var(--color-success)';
   let overallStatusDotClass = 'status-dot green';
-  let overallStatusText = 'Semua Komponen Baik';
-  let overallSummaryText = 'Perjalanan Anda aman. Belum ada komponen yang membutuhkan perhatian segera.';
+  let overallStatusText = 'All Components Healthy';
+  let overallSummaryText = 'Your ride is safe. No components require immediate attention.';
 
   if (criticalCount > 0) {
     strokeColor = 'var(--color-danger)';
     overallStatusDotClass = 'status-dot red';
-    overallStatusText = `${criticalCount} Komponen Kritis!`;
-    overallSummaryText = 'Segera lakukan penggantian suku cadang yang kritis untuk keamanan berkendara.';
+    overallStatusText = `${criticalCount} Critical Components!`;
+    overallSummaryText = 'Immediately replace critical parts for your riding safety.';
   } else if (warningCount > 0) {
     strokeColor = 'var(--color-warning)';
     overallStatusDotClass = 'status-dot yellow';
-    overallStatusText = `${warningCount} Komponen Perlu Perhatian`;
-    overallSummaryText = 'Beberapa suku cadang mendekati batas interval. Agendakan servis dalam waktu dekat.';
+    overallStatusText = `${warningCount} Components Need Attention`;
+    overallSummaryText = 'Some components are nearing their service intervals. Plan a service soon.';
   }
 
   return (
@@ -240,15 +240,15 @@ export default function DashboardTab({
             </svg>
           </div>
           <div className="alert-message">
-            {criticalCount} komponen motor Anda telah melebihi batas kilometer servis! Wajib ganti segera.
+            {criticalCount} of your motorcycle parts have exceeded their service intervals! Replace immediately.
           </div>
         </div>
       )}
 
       <div className="section-header">
         <div>
-          <h2>Dashboard Pemantauan</h2>
-          <p className="section-desc">Status kesehatan suku cadang sepeda motor Anda saat ini.</p>
+          <h2>Monitoring Dashboard</h2>
+          <p className="section-desc">Real-time health status of your motorcycle components.</p>
         </div>
       </div>
 
@@ -268,14 +268,14 @@ export default function DashboardTab({
             </svg>
             <div className="gauge-content">
               <span className="gauge-value" id="overall-health-pct">{overallPercentage}%</span>
-              <span className="gauge-label">Kesehatan</span>
+              <span className="gauge-label">Health</span>
             </div>
           </div>
         </div>
         <div className="overview-details">
           <h3 className="motor-name-display" id="info-motor-name">{activeMotor.name}</h3>
           <div className="motor-meta">
-            <span className="badge" id="info-motor-type">{activeMotor.type}</span>
+            <span className="badge" id="info-motor-type" style={{ textTransform: 'capitalize' }}>{activeMotor.type}</span>
             {activeMotor.plate && <span className="plate-number" id="info-motor-plate">{activeMotor.plate}</span>}
           </div>
           <div className="status-indicator-box">
@@ -290,26 +290,26 @@ export default function DashboardTab({
 
       {/* Parts Status Grid */}
       <div className="parts-grid-header" style={{ display: 'block' }}>
-        <h3>Status Komponen & Suku Cadang</h3>
+        <h3>Component Health Status</h3>
       </div>
       <div className="parts-grid" id="parts-status-grid" style={{ display: 'grid' }}>
         {componentsHealth.map((comp) => {
           let cardStatusClass = '';
-          let badgeText = 'Baik';
+          let badgeText = 'Good';
 
           if (comp.status === 'danger') {
             cardStatusClass = 'status-danger';
-            badgeText = 'Wajib Servis';
+            badgeText = 'Critical';
           } else if (comp.status === 'warning') {
             cardStatusClass = 'status-warning';
-            badgeText = 'Perlu Servis';
+            badgeText = 'Warning';
           }
 
           const cardClass = `part-card ${cardStatusClass}`;
 
           const remainingValText = comp.remaining <= 0 
-            ? `Terlewat ${Math.abs(comp.remaining).toLocaleString('id-ID')} KM`
-            : `Sisa ${comp.remaining.toLocaleString('id-ID')} KM`;
+            ? `Overdue by ${Math.abs(comp.remaining).toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM`
+            : `${comp.remaining.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM left`;
 
           return (
             <div key={comp.name} className={cardClass}>
@@ -328,25 +328,25 @@ export default function DashboardTab({
                   <div className="part-progress-bar-fill" style={{ width: `${comp.percentage}%` }}></div>
                 </div>
                 <div className="part-progress-labels">
-                  <span>{comp.percentage}% Sisa Umur</span>
-                  <span>Batas: {comp.interval.toLocaleString('id-ID')} KM</span>
+                  <span>{comp.percentage}% Life Remaining</span>
+                  <span>Limit: {comp.interval.toLocaleString('id-ID')} KM</span>
                 </div>
               </div>
 
               <div className="part-stats">
                 <div className="stat-box">
-                  <span className="stat-label">Servis Terakhir</span>
-                  <span className="stat-value">{comp.lastServiceOdo.toLocaleString('id-ID')} KM</span>
+                  <span className="stat-label">Last Service</span>
+                  <span className="stat-value">{comp.lastServiceOdo.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM</span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-label">Jarak Tempuh Part</span>
-                  <span className="stat-value">{comp.run.toLocaleString('id-ID')} KM</span>
+                  <span className="stat-label">Part Mileage</span>
+                  <span className="stat-value">{comp.run.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM</span>
                 </div>
               </div>
 
               <div className="part-footer">
                 <div className="remaining-info">
-                  <span className="remaining-label">Estimasi Jarak</span>
+                  <span className="remaining-label">Remaining Range</span>
                   <span className="remaining-value">{remainingValText}</span>
                 </div>
                 <button 
@@ -355,7 +355,7 @@ export default function DashboardTab({
                   onClick={() => onOpenAddServiceModal(comp.name)}
                   style={{ minWidth: '80px', justifyContent: 'center' }}
                 >
-                  Servis
+                  Service
                 </button>
               </div>
             </div>

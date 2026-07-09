@@ -38,15 +38,15 @@ export default function GarageTab({
     <section id="tab-garasi" className="tab-content active">
       <div className="section-header-row">
         <div className="section-header">
-          <h2>Garasi Motor</h2>
-          <p className="section-desc">Kelola kendaraan Anda dan tambahkan motor baru.</p>
+          <h2>Motorcycle Garage</h2>
+          <p className="section-desc">Manage your fleet and register new motorcycles.</p>
         </div>
         <button className="btn btn-primary btn-icon" onClick={onOpenAddMotorModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>Tambah Motor</span>
+          <span>Add Motorcycle</span>
         </button>
       </div>
 
@@ -60,12 +60,12 @@ export default function GarageTab({
               <path d="M12 13l-1-5H7l-2 3M17 10h-5"/>
             </svg>
           </div>
-          <h3>Garasi Anda Kosong</h3>
+          <h3>Your Garage is Empty</h3>
           <p style={{ maxWidth: '400px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            Belum ada sepeda motor yang didaftarkan. Tambahkan motor pertama Anda untuk mulai memantau perawatan suku cadang.
+            No motorcycles have been registered yet. Add your first vehicle to start tracking maintenance intervals.
           </p>
           <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={onOpenAddMotorModal}>
-            Tambah Motor Sekarang
+            Add Motorcycle Now
           </button>
         </div>
       ) : (
@@ -86,7 +86,7 @@ export default function GarageTab({
                 key={motor.id} 
                 className={`motorcycle-card ${isActive ? 'active' : ''}`}
               >
-                {isActive && <span className="active-ribbon">Aktif</span>}
+                {isActive && <span className="active-ribbon">Active</span>}
                 
                 <div className="motor-card-header">
                   <div className="motor-card-icon">
@@ -97,7 +97,7 @@ export default function GarageTab({
                   </div>
                   <div>
                     <h3 className="motor-card-title">{motor.name}</h3>
-                    <span className="badge">{motor.type}</span>
+                    <span className="badge" style={{ textTransform: 'capitalize' }}>{motor.type}</span>
                   </div>
                 </div>
 
@@ -107,18 +107,18 @@ export default function GarageTab({
                     <span className="info-val">{motor.currentOdo.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM</span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">No. Polisi</span>
-                    <span className="info-val">{motor.plate || '-'}</span>
+                    <span className="info-label">License Plate</span>
+                    <span className="info-val" style={{ textTransform: 'uppercase' }}>{motor.plate || '-'}</span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">Kesehatan</span>
+                    <span className="info-label">Health</span>
                     <span className="info-val" style={{ color: healthColor }}>
                       {health.overallPercentage}%
                     </span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">Merk</span>
-                    <span className="info-val">{motor.brand || '-'}</span>
+                    <span className="info-label">Brand</span>
+                    <span className="info-val" style={{ textTransform: 'capitalize' }}>{motor.brand || '-'}</span>
                   </div>
                 </div>
 
@@ -129,7 +129,7 @@ export default function GarageTab({
                       className="btn btn-secondary btn-sm btn-activate-motor"
                       onClick={() => onSelectMotorcycle(motor.id)}
                     >
-                      Aktifkan
+                      Activate
                     </button>
                   ) : (
                     <button 
@@ -145,7 +145,7 @@ export default function GarageTab({
                         flex: 1
                       }}
                     >
-                      Sedang Digunakan
+                      Currently Active
                     </button>
                   )}
                   <button 
@@ -153,7 +153,7 @@ export default function GarageTab({
                     className="btn btn-danger btn-sm btn-delete-motor"
                     onClick={() => handleDeleteClick(motor.id, motor.name)}
                   >
-                    Hapus
+                    Delete
                   </button>
                 </div>
               </div>

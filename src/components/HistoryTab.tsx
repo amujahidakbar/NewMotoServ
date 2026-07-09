@@ -33,13 +33,13 @@ function formatDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
   if (year && month && day) {
     const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return d.toLocaleDateString('id-ID', options);
+    return d.toLocaleDateString('en-US', options);
   }
-  return new Date(dateString).toLocaleDateString('id-ID', options);
+  return new Date(dateString).toLocaleDateString('en-US', options);
 }
 
-// Format Rupiah helper
-function formatRupiah(amount: number) {
+// Format Currency (IDR) helper
+function formatCurrency(amount: number) {
   if (amount === undefined || amount === null) return "-";
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
 }
@@ -59,12 +59,12 @@ export default function HistoryTab({
     return (
       <section id="tab-riwayat" className="tab-content active">
         <div className="section-header">
-          <h2>Riwayat Servis</h2>
-          <p className="section-desc">Catatan servis dan penggantian suku cadang sebelumnya.</p>
+          <h2>Service History</h2>
+          <p className="section-desc">Historical service logs and replacement records.</p>
         </div>
         <div className="empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem' }}>
-          <h3>Belum Ada Kendaraan Aktif</h3>
-          <p>Tambahkan motor di Garasi terlebih dahulu untuk melihat riwayat servis.</p>
+          <h3>No Active Motorcycle</h3>
+          <p>Please select or add a motorcycle first to view service history.</p>
         </div>
       </section>
     );
@@ -120,8 +120,8 @@ export default function HistoryTab({
 
   // Get list of all component options to populate filter dropdown based on logs available
   const componentFilterOptions = [
-    "Oli Mesin", "Busi", "Oli Transmisi", "Ban Depan", "Ban Belakang",
-    "Rantai", "Drive Belt", "Coolant", "Kampas Rem", "Filter Udara", "Aki"
+    "Engine Oil", "Spark Plug", "Gear Oil", "Front Tyre", "Rear Tyre",
+    "Chain", "Drive Belt", "Coolant", "Brake Pads", "Air Filter", "Battery"
   ];
 
   const handleDeleteClick = (id: string) => {
@@ -132,15 +132,15 @@ export default function HistoryTab({
     <section id="tab-riwayat" className="tab-content active">
       <div className="section-header-row">
         <div className="section-header">
-          <h2>Riwayat Servis</h2>
-          <p className="section-desc">Catatan servis dan penggantian suku cadang motor ({activeMotor.name}).</p>
+          <h2>Service History</h2>
+          <p className="section-desc">Service records and parts replacements for ({activeMotor.name}).</p>
         </div>
         <button className="btn btn-primary btn-icon" onClick={onOpenAddServiceModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>Catat Servis Baru</span>
+          <span>Record Service</span>
         </button>
       </div>
 
@@ -148,7 +148,7 @@ export default function HistoryTab({
       <div className="filters-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div className="filter-group" style={{ flex: '1 1 200px' }}>
-            <label htmlFor="filter-component">Filter Suku Cadang</label>
+            <label htmlFor="filter-component">Filter Component</label>
             <select 
               id="filter-component" 
               className="custom-select custom-select-sm"
@@ -156,7 +156,7 @@ export default function HistoryTab({
               onChange={(e) => setFilterComponent(e.target.value)}
               style={{ width: '100%' }}
             >
-              <option value="all">Semua Komponen</option>
+              <option value="all">All Components</option>
               {componentFilterOptions.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
@@ -164,7 +164,7 @@ export default function HistoryTab({
           </div>
 
           <div className="filter-group" style={{ flex: '1 1 200px' }}>
-            <label htmlFor="filter-timerange">Rentang Waktu</label>
+            <label htmlFor="filter-timerange">Date Range</label>
             <select 
               id="filter-timerange" 
               className="custom-select custom-select-sm"
@@ -172,11 +172,11 @@ export default function HistoryTab({
               onChange={(e) => setTimeRange(e.target.value as any)}
               style={{ width: '100%' }}
             >
-              <option value="all">Semua Waktu</option>
-              <option value="30">30 Hari Terakhir</option>
-              <option value="90">90 Hari Terakhir</option>
-              <option value="year">Tahun Ini</option>
-              <option value="custom">Kustom (Pilih Tanggal)</option>
+              <option value="all">All Time</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom Range</option>
             </select>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function HistoryTab({
         {timeRange === 'custom' && (
           <div className="filter-date-inputs" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', animation: 'fadeIn 0.2s ease-out' }}>
             <div className="filter-group" style={{ flex: '1 1 140px', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Mulai</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Start Date</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -194,7 +194,7 @@ export default function HistoryTab({
               />
             </div>
             <div className="filter-group" style={{ flex: '1 1 140px', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tanggal Selesai</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>End Date</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -218,15 +218,15 @@ export default function HistoryTab({
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10 9 9 9 8 9"/>
             </svg>
-            <h3>Belum ada riwayat servis</h3>
+            <h3>No service logs recorded</h3>
             <p>
               {filterComponent === 'all' 
-                ? 'Catat servis pertama Anda untuk mulai melacak performa komponen.'
-                : `Tidak ditemukan riwayat servis untuk komponen "${filterComponent}".`
+                ? 'Record your first service to start tracking component lifetimes.'
+                : `No service records found for component "${filterComponent}".`
               }
             </p>
             {filterComponent === 'all' && (
-              <button className="btn btn-secondary btn-sm" onClick={onOpenAddServiceModal}>Catat Sekarang</button>
+              <button className="btn btn-secondary btn-sm" onClick={onOpenAddServiceModal}>Record Now</button>
             )}
           </div>
         ) : (
@@ -234,12 +234,12 @@ export default function HistoryTab({
             <table className="history-table">
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Odometer Servis</th>
-                  <th>Komponen</th>
-                  <th>Biaya (Rp)</th>
-                  <th>Catatan</th>
-                  <th style={{ width: '80px', textAlign: 'center' }}>Aksi</th>
+                  <th>Date</th>
+                  <th>Service Odometer</th>
+                  <th>Components</th>
+                  <th>Cost (IDR)</th>
+                  <th>Notes</th>
+                  <th style={{ width: '80px', textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -261,7 +261,7 @@ export default function HistoryTab({
                       </div>
                     </td>
                     <td style={{ color: 'var(--color-primary)', fontWeight: '600' }}>
-                      {formatRupiah(log.cost)}
+                      {formatCurrency(log.cost)}
                     </td>
                     <td>
                       <span className="log-notes" style={{ display: 'block', maxWidth: '280px', whiteSpace: 'normal', wordBreak: 'break-word', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -271,7 +271,7 @@ export default function HistoryTab({
                     <td style={{ textAlign: 'center' }}>
                       <button 
                         className="btn btn-danger btn-icon-only btn-sm" 
-                        title="Hapus Catatan"
+                        title="Delete Log"
                         style={{ padding: '0.35rem', borderColor: 'rgba(239, 68, 68, 0.1)' }}
                         onClick={() => handleDeleteClick(log.id)}
                       >
