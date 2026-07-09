@@ -20,15 +20,53 @@ interface GarageTabProps {
   onSelectMotorcycle: (id: string) => void;
   onDeleteMotorcycle: (id: string) => void;
   onOpenAddMotorModal: () => void;
+  lang: 'en' | 'id';
 }
+
+const TRANSLATIONS = {
+  en: {
+    garageTitle: "Motorcycle Garage",
+    garageDesc: "Manage your fleet and register new motorcycles.",
+    addMotor: "Add Motorcycle",
+    emptyGarage: "Your Garage is Empty",
+    emptyGarageDesc: "No motorcycles have been registered yet. Add your first vehicle to start tracking maintenance intervals.",
+    addMotorNow: "Add Motorcycle Now",
+    active: "Active",
+    odometer: "Odometer",
+    licensePlate: "License Plate",
+    health: "Health",
+    brand: "Brand",
+    activate: "Activate",
+    currentlyActive: "Currently Active",
+    delete: "Delete"
+  },
+  id: {
+    garageTitle: "Garasi Motor",
+    garageDesc: "Kelola armada kendaraan Anda dan daftarkan motor baru.",
+    addMotor: "Tambah Motor",
+    emptyGarage: "Garasi Anda Kosong",
+    emptyGarageDesc: "Belum ada motor yang didaftarkan. Tambahkan kendaraan pertama Anda untuk mulai memantau masa pakai suku cadang.",
+    addMotorNow: "Tambah Motor Sekarang",
+    active: "Aktif",
+    odometer: "Odometer",
+    licensePlate: "Nomor Polisi",
+    health: "Kesehatan",
+    brand: "Merk / Brand",
+    activate: "Aktifkan",
+    currentlyActive: "Sedang Aktif",
+    delete: "Hapus"
+  }
+};
 
 export default function GarageTab({
   motorcycles,
   activeMotorcycleId,
   onSelectMotorcycle,
   onDeleteMotorcycle,
-  onOpenAddMotorModal
+  onOpenAddMotorModal,
+  lang
 }: GarageTabProps) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const handleDeleteClick = (id: string, name: string) => {
     onDeleteMotorcycle(id);
@@ -38,15 +76,15 @@ export default function GarageTab({
     <section id="tab-garasi" className="tab-content active">
       <div className="section-header-row">
         <div className="section-header">
-          <h2>Motorcycle Garage</h2>
-          <p className="section-desc">Manage your fleet and register new motorcycles.</p>
+          <h2>{t.garageTitle}</h2>
+          <p className="section-desc">{t.garageDesc}</p>
         </div>
         <button className="btn btn-primary btn-icon" onClick={onOpenAddMotorModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>Add Motorcycle</span>
+          <span>{t.addMotor}</span>
         </button>
       </div>
 
@@ -60,12 +98,12 @@ export default function GarageTab({
               <path d="M12 13l-1-5H7l-2 3M17 10h-5"/>
             </svg>
           </div>
-          <h3>Your Garage is Empty</h3>
+          <h3>{t.emptyGarage}</h3>
           <p style={{ maxWidth: '400px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            No motorcycles have been registered yet. Add your first vehicle to start tracking maintenance intervals.
+            {t.emptyGarageDesc}
           </p>
           <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={onOpenAddMotorModal}>
-            Add Motorcycle Now
+            {t.addMotorNow}
           </button>
         </div>
       ) : (
@@ -86,7 +124,7 @@ export default function GarageTab({
                 key={motor.id} 
                 className={`motorcycle-card ${isActive ? 'active' : ''}`}
               >
-                {isActive && <span className="active-ribbon">Active</span>}
+                {isActive && <span className="active-ribbon">{t.active}</span>}
                 
                 <div className="motor-card-header">
                   <div className="motor-card-icon">
@@ -103,21 +141,21 @@ export default function GarageTab({
 
                 <div className="motor-card-info-grid">
                   <div className="info-box">
-                    <span className="info-label">Odometer</span>
+                    <span className="info-label">{t.odometer}</span>
                     <span className="info-val">{motor.currentOdo.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM</span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">License Plate</span>
+                    <span className="info-label">{t.licensePlate}</span>
                     <span className="info-val" style={{ textTransform: 'uppercase' }}>{motor.plate || '-'}</span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">Health</span>
+                    <span className="info-label">{t.health}</span>
                     <span className="info-val" style={{ color: healthColor }}>
                       {health.overallPercentage}%
                     </span>
                   </div>
                   <div className="info-box">
-                    <span className="info-label">Brand</span>
+                    <span className="info-label">{t.brand}</span>
                     <span className="info-val" style={{ textTransform: 'capitalize' }}>{motor.brand || '-'}</span>
                   </div>
                 </div>
@@ -129,7 +167,7 @@ export default function GarageTab({
                       className="btn btn-secondary btn-sm btn-activate-motor"
                       onClick={() => onSelectMotorcycle(motor.id)}
                     >
-                      Activate
+                      {t.activate}
                     </button>
                   ) : (
                     <button 
@@ -145,7 +183,7 @@ export default function GarageTab({
                         flex: 1
                       }}
                     >
-                      Currently Active
+                      {t.currentlyActive}
                     </button>
                   )}
                   <button 
@@ -153,7 +191,7 @@ export default function GarageTab({
                     className="btn btn-danger btn-sm btn-delete-motor"
                     onClick={() => handleDeleteClick(motor.id, motor.name)}
                   >
-                    Delete
+                    {t.delete}
                   </button>
                 </div>
               </div>

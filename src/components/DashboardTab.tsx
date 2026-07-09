@@ -19,7 +19,61 @@ interface DashboardTabProps {
   activeMotor: Motorcycle | undefined;
   onOpenAddMotorModal: () => void;
   onOpenAddServiceModal: (preselectedComponent?: string) => void;
+  lang: 'en' | 'id';
 }
+
+const TRANSLATIONS = {
+  en: {
+    monitoringDashboard: "Monitoring Dashboard",
+    realtimeHealth: "Real-time health status of your motorcycle components.",
+    noVehicles: "No Vehicles in Your Garage",
+    addFirstBikeDesc: "Add your first motorcycle to start tracking your odometer and monitoring component health automatically.",
+    addFirstBike: "Add First Motorcycle",
+    health: "Health",
+    allComponentsHealthy: "All Components Healthy",
+    noComponentsImmediate: "Your ride is safe. No components require immediate attention.",
+    replaceImmediately: "Immediately replace critical parts for your riding safety.",
+    nearInterval: "Some components are nearing their service intervals. Plan a service soon.",
+    globalAlertBannerSuffix: "of your motorcycle parts have exceeded their service intervals! Replace immediately.",
+    componentHealthStatus: "Component Health Status",
+    good: "Good",
+    critical: "Critical",
+    warning: "Warning",
+    overdueBy: "Overdue by",
+    left: "left",
+    lifeRemaining: "Life Remaining",
+    limit: "Limit",
+    lastService: "Last Service",
+    partMileage: "Part Mileage",
+    remainingRange: "Remaining Range",
+    service: "Service"
+  },
+  id: {
+    monitoringDashboard: "Dashboard Pemantauan",
+    realtimeHealth: "Status kesehatan suku cadang motor Anda secara real-time.",
+    noVehicles: "Tidak Ada Kendaraan di Garasi Anda",
+    addFirstBikeDesc: "Tambahkan motor pertama Anda untuk mulai melacak odometer dan memantau kesehatan komponen secara otomatis.",
+    addFirstBike: "Tambah Motor Pertama",
+    health: "Kesehatan",
+    allComponentsHealthy: "Semua Komponen Sehat",
+    noComponentsImmediate: "Motor Anda aman. Tidak ada komponen yang membutuhkan perhatian segera.",
+    replaceImmediately: "Segera ganti komponen kritis demi keselamatan berkendara Anda.",
+    nearInterval: "Beberapa komponen mendekati batas interval servis. Rencanakan servis segera.",
+    globalAlertBannerSuffix: "komponen motor Anda telah melewati batas interval servis! Segera lakukan penggantian.",
+    componentHealthStatus: "Status Kesehatan Komponen",
+    good: "Baik",
+    critical: "Kritis",
+    warning: "Peringatan",
+    overdueBy: "Terlewat",
+    left: "tersisa",
+    lifeRemaining: "Masa Pakai Tersisa",
+    limit: "Batas",
+    lastService: "Servis Terakhir",
+    partMileage: "Jarak Tempuh Komponen",
+    remainingRange: "Sisa Jarak Tempuh",
+    service: "Servis"
+  }
+};
 
 // Helper to render component icons (supports English and legacy Indonesian component names)
 export function getComponentIcon(name: string) {
@@ -120,16 +174,19 @@ export function getComponentIcon(name: string) {
 export default function DashboardTab({
   activeMotor,
   onOpenAddMotorModal,
-  onOpenAddServiceModal
+  onOpenAddServiceModal,
+  lang
 }: DashboardTabProps) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
   // 1. Render empty state if no active motor
   if (!activeMotor) {
     return (
       <section id="tab-dashboard" className="tab-content active">
         <div className="section-header">
           <div>
-            <h2>Monitoring Dashboard</h2>
-            <p className="section-desc">Real-time health status of your motorcycle components.</p>
+            <h2>{t.monitoringDashboard}</h2>
+            <p className="section-desc">{t.realtimeHealth}</p>
           </div>
         </div>
 
@@ -161,9 +218,9 @@ export default function DashboardTab({
             </svg>
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No Vehicles in Your Garage</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{t.noVehicles}</h3>
             <p className="text-secondary" style={{ fontSize: '0.95rem', maxWidth: '400px', margin: '0 auto', lineHeight: 1.5 }}>
-              Add your first motorcycle to start tracking your odometer and monitoring component health automatically.
+              {t.addFirstBikeDesc}
             </p>
           </div>
           <button 
@@ -176,7 +233,7 @@ export default function DashboardTab({
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span>Add First Motorcycle</span>
+            <span>{t.addFirstBike}</span>
           </button>
         </div>
       </section>
@@ -212,19 +269,19 @@ export default function DashboardTab({
   // Determine overall status indicators
   let strokeColor = 'var(--color-success)';
   let overallStatusDotClass = 'status-dot green';
-  let overallStatusText = 'All Components Healthy';
-  let overallSummaryText = 'Your ride is safe. No components require immediate attention.';
+  let overallStatusText = t.allComponentsHealthy;
+  let overallSummaryText = t.noComponentsImmediate;
 
   if (criticalCount > 0) {
     strokeColor = 'var(--color-danger)';
     overallStatusDotClass = 'status-dot red';
-    overallStatusText = `${criticalCount} Critical Components!`;
-    overallSummaryText = 'Immediately replace critical parts for your riding safety.';
+    overallStatusText = lang === 'en' ? `${criticalCount} Critical Components!` : `${criticalCount} Komponen Kritis!`;
+    overallSummaryText = t.replaceImmediately;
   } else if (warningCount > 0) {
     strokeColor = 'var(--color-warning)';
     overallStatusDotClass = 'status-dot yellow';
-    overallStatusText = `${warningCount} Components Need Attention`;
-    overallSummaryText = 'Some components are nearing their service intervals. Plan a service soon.';
+    overallStatusText = lang === 'en' ? `${warningCount} Components Need Attention` : `${warningCount} Komponen Perlu Perhatian`;
+    overallSummaryText = t.nearInterval;
   }
 
   return (
@@ -240,15 +297,17 @@ export default function DashboardTab({
             </svg>
           </div>
           <div className="alert-message">
-            {criticalCount} of your motorcycle parts have exceeded their service intervals! Replace immediately.
+            {lang === 'en' 
+              ? `${criticalCount} ${t.globalAlertBannerSuffix}` 
+              : `${criticalCount} ${t.globalAlertBannerSuffix}`}
           </div>
         </div>
       )}
 
       <div className="section-header">
         <div>
-          <h2>Monitoring Dashboard</h2>
-          <p className="section-desc">Real-time health status of your motorcycle components.</p>
+          <h2>{t.monitoringDashboard}</h2>
+          <p className="section-desc">{t.realtimeHealth}</p>
         </div>
       </div>
 
@@ -268,7 +327,7 @@ export default function DashboardTab({
             </svg>
             <div className="gauge-content">
               <span className="gauge-value" id="overall-health-pct">{overallPercentage}%</span>
-              <span className="gauge-label">Health</span>
+              <span className="gauge-label">{t.health}</span>
             </div>
           </div>
         </div>
@@ -290,26 +349,26 @@ export default function DashboardTab({
 
       {/* Parts Status Grid */}
       <div className="parts-grid-header" style={{ display: 'block' }}>
-        <h3>Component Health Status</h3>
+        <h3>{t.componentHealthStatus}</h3>
       </div>
       <div className="parts-grid" id="parts-status-grid" style={{ display: 'grid' }}>
         {componentsHealth.map((comp) => {
           let cardStatusClass = '';
-          let badgeText = 'Good';
+          let badgeText = t.good;
 
           if (comp.status === 'danger') {
             cardStatusClass = 'status-danger';
-            badgeText = 'Critical';
+            badgeText = t.critical;
           } else if (comp.status === 'warning') {
             cardStatusClass = 'status-warning';
-            badgeText = 'Warning';
+            badgeText = t.warning;
           }
 
           const cardClass = `part-card ${cardStatusClass}`;
 
           const remainingValText = comp.remaining <= 0 
-            ? `Overdue by ${Math.abs(comp.remaining).toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM`
-            : `${comp.remaining.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM left`;
+            ? `${t.overdueBy} ${Math.abs(comp.remaining).toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM`
+            : `${comp.remaining.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM ${t.left}`;
 
           return (
             <div key={comp.name} className={cardClass}>
@@ -328,25 +387,25 @@ export default function DashboardTab({
                   <div className="part-progress-bar-fill" style={{ width: `${comp.percentage}%` }}></div>
                 </div>
                 <div className="part-progress-labels">
-                  <span>{comp.percentage}% Life Remaining</span>
-                  <span>Limit: {comp.interval.toLocaleString('id-ID')} KM</span>
+                  <span>{comp.percentage}% {t.lifeRemaining}</span>
+                  <span>{t.limit}: {comp.interval.toLocaleString('id-ID')} KM</span>
                 </div>
               </div>
 
               <div className="part-stats">
                 <div className="stat-box">
-                  <span className="stat-label">Last Service</span>
+                  <span className="stat-label">{t.lastService}</span>
                   <span className="stat-value">{comp.lastServiceOdo.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM</span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-label">Part Mileage</span>
+                  <span className="stat-label">{t.partMileage}</span>
                   <span className="stat-value">{comp.run.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM</span>
                 </div>
               </div>
 
               <div className="part-footer">
                 <div className="remaining-info">
-                  <span className="remaining-label">Remaining Range</span>
+                  <span className="remaining-label">{t.remainingRange}</span>
                   <span className="remaining-value">{remainingValText}</span>
                 </div>
                 <button 
@@ -355,7 +414,7 @@ export default function DashboardTab({
                   onClick={() => onOpenAddServiceModal(comp.name)}
                   style={{ minWidth: '80px', justifyContent: 'center' }}
                 >
-                  Service
+                  {t.service}
                 </button>
               </div>
             </div>

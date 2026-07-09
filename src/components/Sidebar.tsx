@@ -25,7 +25,48 @@ interface SidebarProps {
   onOpenAuthModal: () => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
+  lang: 'en' | 'id';
+  onToggleLang: () => void;
 }
+
+const TRANSLATIONS = {
+  en: {
+    profileMenu: "Profile Menu",
+    openProfile: "Open Profile Menu",
+    guestSession: "Guest Session",
+    localData: "Data Saved Locally",
+    logOut: "Log Out",
+    loginRegister: "Login / Register",
+    activeMotorcycle: "Active Motorcycle",
+    noMotorcycles: "No motorcycles",
+    addNewMotor: "Add New Motorcycle",
+    currentOdo: "Current Odometer",
+    updateOdo: "Update Odo",
+    dashboard: "Dashboard",
+    history: "Service History",
+    garage: "Garage",
+    fuel: "Fuel Tracker",
+    settings: "Settings"
+  },
+  id: {
+    profileMenu: "Menu Profil",
+    openProfile: "Buka Menu Profil",
+    guestSession: "Sesi Tamu",
+    localData: "Data Disimpan Lokal",
+    logOut: "Keluar",
+    loginRegister: "Masuk / Daftar",
+    activeMotorcycle: "Motor Aktif",
+    noMotorcycles: "Tidak ada motor",
+    addNewMotor: "Tambah Motor Baru",
+    currentOdo: "Odometer Saat Ini",
+    updateOdo: "Update KM",
+    dashboard: "Dashboard",
+    history: "Riwayat Servis",
+    garage: "Garasi",
+    fuel: "BBM",
+    settings: "Pengaturan"
+  }
+};
 
 export default function Sidebar({
   user,
@@ -39,10 +80,13 @@ export default function Sidebar({
   onLogout,
   onOpenAuthModal,
   theme,
-  onToggleTheme
+  onToggleTheme,
+  lang,
+  onToggleLang
 }: SidebarProps) {
   const activeMotor = motorcycles.find(m => m.id === activeMotorcycleId);
   const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const renderProfileMenu = (position: 'desktop' | 'mobile') => {
     const isDesktop = position === 'desktop';
@@ -66,8 +110,8 @@ export default function Sidebar({
             cursor: 'pointer',
             boxShadow: 'var(--shadow-sm)'
           }}
-          title="Profile Menu"
-          aria-label="Open Profile Menu"
+          title={t.profileMenu}
+          aria-label={t.openProfile}
           aria-expanded={showProfileMenu}
         >
           {user ? user.name.charAt(0).toUpperCase() : 'G'}
@@ -83,10 +127,10 @@ export default function Sidebar({
                 </div>
                 <div className="profile-dropdown-info">
                   <div className="profile-dropdown-name" style={{ color: 'var(--text-primary)' }}>
-                    {user ? user.name : 'Guest Session'}
+                    {user ? user.name : t.guestSession}
                   </div>
                   <div className="profile-dropdown-email">
-                    {user ? user.email : 'Data Saved Locally'}
+                    {user ? user.email : t.localData}
                   </div>
                 </div>
               </div>
@@ -100,14 +144,14 @@ export default function Sidebar({
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
                     </svg>
-                    <span>Log Out</span>
+                    <span>{t.logOut}</span>
                   </button>
                 ) : (
                   <button 
                     className="btn btn-primary btn-sm profile-dropdown-btn-login" 
                     onClick={() => { setShowProfileMenu(false); onOpenAuthModal(); }}
                   >
-                    <span>Login / Register</span>
+                    <span>{t.loginRegister}</span>
                   </button>
                 )}
               </div>
@@ -130,7 +174,33 @@ export default function Sidebar({
           </div>
           <h1>Moto<span>Serv</span></h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          {/* Language Switch Button */}
+          <button 
+            className="btn btn-secondary btn-icon-only theme-toggle-btn" 
+            onClick={onToggleLang}
+            title={lang === 'en' ? "Switch to Indonesian" : "Ubah ke Bahasa Inggris"}
+            style={{ 
+              width: '32px', 
+              height: '32px', 
+              border: 'none', 
+              background: 'var(--border-color)', 
+              borderRadius: '50%',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '0',
+              color: 'var(--text-primary)',
+              fontSize: '0.75rem',
+              fontWeight: 700
+            }}
+            aria-label="Toggle language"
+          >
+            {lang === 'en' ? 'EN' : 'ID'}
+          </button>
+
+          {/* Theme Toggle Button */}
           <button 
             className="btn btn-secondary btn-icon-only theme-toggle-btn" 
             onClick={onToggleTheme}
@@ -160,6 +230,7 @@ export default function Sidebar({
               </svg>
             )}
           </button>
+          
           <div className="mobile-profile-only">
             {renderProfileMenu('mobile')}
           </div>
@@ -168,7 +239,7 @@ export default function Sidebar({
 
       {/* Active Motorcycle Selector */}
       <div className="motorcycle-selector-container">
-        <label htmlFor="active-motorcycle-select">Active Motorcycle</label>
+        <label htmlFor="active-motorcycle-select">{t.activeMotorcycle}</label>
         <div className="selector-row">
           <div className="select-wrapper" style={{ flex: 1 }}>
             <select 
@@ -179,7 +250,7 @@ export default function Sidebar({
               disabled={motorcycles.length === 0}
             >
               {motorcycles.length === 0 ? (
-                <option value="">No motorcycles</option>
+                <option value="">{t.noMotorcycles}</option>
               ) : (
                 motorcycles.map(m => (
                   <option key={m.id} value={m.id}>
@@ -192,7 +263,7 @@ export default function Sidebar({
           <button 
             className="btn btn-secondary btn-icon-only" 
             id="btn-quick-add-motor" 
-            title="Add New Motorcycle"
+            title={t.addNewMotor}
             onClick={onOpenAddMotorModal}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -206,7 +277,7 @@ export default function Sidebar({
       {activeMotor && (
         <div className="odometer-widget" id="header-odometer-widget">
           <div className="odo-info">
-            <span className="odo-label">Current Odometer</span>
+            <span className="odo-label">{t.currentOdo}</span>
             <span className="odo-value" id="header-odometer-value">
               {activeMotor.currentOdo.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} <small>KM</small>
             </span>
@@ -214,13 +285,13 @@ export default function Sidebar({
           <button 
             className="btn btn-primary btn-sm btn-icon" 
             id="btn-quick-update-odo" 
-            title="Update Odometer"
+            title={t.updateOdo}
             onClick={onOpenUpdateOdoModal}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
             </svg>
-            <span>Update Odo</span>
+            <span>{t.updateOdo}</span>
           </button>
         </div>
       )}
@@ -237,7 +308,7 @@ export default function Sidebar({
             <rect x="14" y="12" width="7" height="9" rx="1"/>
             <rect x="3" y="16" width="7" height="5" rx="1"/>
           </svg>
-          <span>Dashboard</span>
+          <span>{t.dashboard}</span>
         </button>
         <button 
           className={`nav-item ${activeTab === 'riwayat' ? 'active' : ''}`} 
@@ -246,7 +317,7 @@ export default function Sidebar({
           <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <span>Service History</span>
+          <span>{t.history}</span>
         </button>
         <button 
           className={`nav-item ${activeTab === 'garasi' ? 'active' : ''}`} 
@@ -256,7 +327,7 @@ export default function Sidebar({
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h2M21 17a2 2 0 11-4 0M7 17a2 2 0 11-4 0"/>
             <path d="M13 6h-3M16 10H5"/>
           </svg>
-          <span>Garage</span>
+          <span>{t.garage}</span>
         </button>
         <button 
           className={`nav-item ${activeTab === 'bbm' ? 'active' : ''}`} 
@@ -268,7 +339,7 @@ export default function Sidebar({
             <circle cx="18" cy="14" r="1"/>
             <path d="M10 2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
           </svg>
-          <span>Fuel Tracker</span>
+          <span>{t.fuel}</span>
         </button>
         <button 
           className={`nav-item ${activeTab === 'pengaturan' ? 'active' : ''}`} 
@@ -278,7 +349,7 @@ export default function Sidebar({
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
-          <span>Settings</span>
+          <span>{t.settings}</span>
         </button>
       </nav>
 

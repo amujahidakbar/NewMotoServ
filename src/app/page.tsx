@@ -61,6 +61,7 @@ export default function Home() {
   const [logs, setLogs] = useState<ServiceLog[]>([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [lang, setLang] = useState<'en' | 'id'>('en');
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
   const [isAddFuelOpen, setIsAddFuelOpen] = useState(false);
@@ -252,6 +253,14 @@ export default function Home() {
     }
   }, []);
 
+  // 3d. Read language configuration on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem('motoserv_lang') as 'en' | 'id';
+    if (savedLang) {
+      setLang(savedLang);
+    }
+  }, []);
+
   // 3b. Sync theme changes with body class list
   useEffect(() => {
     if (theme === 'light') {
@@ -317,19 +326,28 @@ export default function Home() {
   // 6. Logout handler
   const handleLogout = () => {
     showCustomConfirm(
-      'Confirm Logout',
-      'Are you sure you want to log out of your account? Your cloud data will remain secure.',
+      lang === 'en' ? 'Confirm Logout' : 'Konfirmasi Keluar',
+      lang === 'en'
+        ? 'Are you sure you want to log out of your account? Your cloud data will remain secure.'
+        : 'Apakah Anda yakin ingin keluar dari akun Anda? Seluruh data yang tersimpan di cloud tetap aman.',
       async () => {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
           setUser(null);
-          showCustomAlert('Logged Out', 'You have been successfully logged out.');
+          showCustomAlert(
+            lang === 'en' ? 'Logged Out' : 'Sesi Berakhir',
+            lang === 'en' ? 'You have been successfully logged out.' : 'Anda telah berhasil keluar.'
+          );
         } catch (err) {
           console.error('Logout error:', err);
         }
       },
       undefined,
-      { confirmText: 'Log Out', cancelText: 'Cancel', isDanger: true }
+      {
+        confirmText: lang === 'en' ? 'Log Out' : 'Keluar',
+        cancelText: lang === 'en' ? 'Cancel' : 'Batal',
+        isDanger: true
+      }
     );
   };
 
@@ -338,6 +356,13 @@ export default function Home() {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     localStorage.setItem('motoserv_theme', newTheme);
+  };
+
+  // 6b. Language toggler
+  const toggleLang = () => {
+    const newLang = lang === 'en' ? 'id' : 'en';
+    setLang(newLang);
+    localStorage.setItem('motoserv_lang', newLang);
   };
 
   // 7. Handle active motorcycle toggle
@@ -1048,7 +1073,13 @@ export default function Home() {
   if (!user) {
     return (
       <>
-        <LandingPage theme={theme} onToggleTheme={toggleTheme} onStartAuth={() => setIsAuthOpen(true)} />
+        <LandingPage
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          lang={lang}
+          onToggleLang={toggleLang}
+          onStartAuth={() => setIsAuthOpen(true)}
+        />
         {isAuthOpen && (
           <div className="modal-backdrop open" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', zIndex: 110 }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '420px' }}>
@@ -1072,15 +1103,15 @@ export default function Home() {
                   fontWeight: 'bold',
                   zIndex: 10
                 }}
-                aria-label="Tutup"
+                aria-label={lang === 'en' ? 'Close' : 'Tutup'}
               >
                 &times;
               </button>
-              <Auth onAuthSuccess={handleAuthSuccess} />
+              <Auth onAuthSuccess={handleAuthSuccess} lang={lang} />
             </div>
           </div>
         )}
-        <CustomDialog {...dialogConfig} />
+        <CustomDialog {...dialogConfig} lang={lang} />
       </>
     );
   }
@@ -1102,6 +1133,8 @@ export default function Home() {
         onOpenAuthModal={() => setIsAuthOpen(true)}
         theme={theme}
         onToggleTheme={toggleTheme}
+        lang={lang}
+        onToggleLang={toggleLang}
       />
 
       <main className="app-main">
@@ -1113,6 +1146,7 @@ export default function Home() {
               setPreselectedCompForService(comp);
               setIsAddServiceOpen(true);
             }}
+            lang={lang}
           />
         )}
 
@@ -1125,6 +1159,7 @@ export default function Home() {
               setPreselectedCompForService(undefined);
               setIsAddServiceOpen(true);
             }}
+            lang={lang}
           />
         )}
 
@@ -1135,6 +1170,7 @@ export default function Home() {
             onSelectMotorcycle={handleSelectMotorcycle}
             onDeleteMotorcycle={handleDeleteMotorcycle}
             onOpenAddMotorModal={() => setIsAddMotorOpen(true)}
+            lang={lang}
           />
         )}
 
@@ -1151,6 +1187,7 @@ export default function Home() {
             onSubscribeNotifications={handleSubscribeNotifications}
             showAlert={showCustomAlert}
             showConfirm={showCustomConfirm}
+            lang={lang}
           />
         )}
 
@@ -1165,11 +1202,12 @@ export default function Home() {
             }}
             onDeleteFuelLog={handleDeleteFuelLog}
             showConfirm={showCustomConfirm}
+            lang={lang}
           />
         )}
 
         <footer className="app-footer">
-          <p>&copy; 2026 MotoServ. Developed by <a href="https://www.linkedin.com/in/amujahidakbar/" target="_blank" rel="noopener noreferrer">Mujahid Akbar</a>.</p>
+          <p>&copy; 2026 MotoServ. {lang === 'en' ? 'Developed by' : 'Dibuat oleh'} <a href="https://www.linkedin.com/in/amujahidakbar/" target="_blank" rel="noopener noreferrer">Mujahid Akbar</a>.</p>
         </footer>
       </main>
 
@@ -1178,6 +1216,7 @@ export default function Home() {
         <AddAddMotorModalWrapper 
           onClose={() => setIsAddMotorOpen(false)}
           onAdd={handleAddMotorcycle}
+          lang={lang}
         />
       )}
 
@@ -1186,6 +1225,7 @@ export default function Home() {
           activeMotor={activeMotor}
           onClose={() => setIsUpdateOdoOpen(false)}
           onUpdate={handleUpdateOdometer}
+          lang={lang}
         />
       )}
 
@@ -1198,6 +1238,7 @@ export default function Home() {
             setPreselectedCompForService(undefined);
           }}
           onAddLog={handleAddServiceLog}
+          lang={lang}
         />
       )}
 
@@ -1210,6 +1251,7 @@ export default function Home() {
             setEditingFuelLog(null);
           }}
           onAdd={handleAddFuelLog}
+          lang={lang}
         />
       )}
 
@@ -1218,6 +1260,7 @@ export default function Home() {
           activeMotor={activeMotor}
           onClose={() => setIsAddCustomCompOpen(false)}
           onAdd={handleAddCustomComponent}
+          lang={lang}
         />
       )}
 
@@ -1246,7 +1289,7 @@ export default function Home() {
             >
               &times;
             </button>
-            <Auth onAuthSuccess={handleAuthSuccess} />
+            <Auth onAuthSuccess={handleAuthSuccess} lang={lang} />
           </div>
         </div>
       )}
@@ -1333,7 +1376,7 @@ export default function Home() {
       )}
 
       {/* CUSTOM DIALOG */}
-      <CustomDialog {...dialogConfig} />
+      <CustomDialog {...dialogConfig} lang={lang} />
     </div>
   );
 }
@@ -1347,8 +1390,9 @@ interface AddMotorcycleModalWrapperProps {
     type: string;
     currentOdo: number;
   }) => Promise<boolean>;
+  lang: 'en' | 'id';
 }
 
-function AddAddMotorModalWrapper({ onClose, onAdd }: AddMotorcycleModalWrapperProps) {
-  return <AddMotorcycleModal onClose={onClose} onAdd={onAdd} />;
+function AddAddMotorModalWrapper({ onClose, onAdd, lang }: AddMotorcycleModalWrapperProps) {
+  return <AddMotorcycleModal onClose={onClose} onAdd={onAdd} lang={lang} />;//;
 }

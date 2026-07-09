@@ -12,16 +12,41 @@ interface UpdateOdometerModalProps {
   activeMotor: Motorcycle;
   onClose: () => void;
   onUpdate: (newOdo: number) => Promise<boolean>;
+  lang: 'en' | 'id';
 }
+
+const TRANSLATIONS = {
+  en: {
+    updateTitle: "Update Odometer",
+    currentOdo: "Current Odometer",
+    newOdo: "New Odometer (KM)",
+    helpText: "Enter the current odometer reading from your motorcycle dashboard.",
+    cancel: "Cancel",
+    saving: "Saving...",
+    saveBtn: "Save Changes"
+  },
+  id: {
+    updateTitle: "Update Odometer",
+    currentOdo: "Odometer Saat Ini",
+    newOdo: "Odometer Baru (KM)",
+    helpText: "Masukkan pembacaan odometer saat ini dari dasbor motor Anda.",
+    cancel: "Batal",
+    saving: "Menyimpan...",
+    saveBtn: "Simpan Perubahan"
+  }
+};
 
 export default function UpdateOdometerModal({
   activeMotor,
   onClose,
-  onUpdate
+  onUpdate,
+  lang
 }: UpdateOdometerModalProps) {
   const [newOdo, setNewOdo] = useState<string>(activeMotor.currentOdo.toString());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const parsedNewOdo = parseFloat(newOdo) || 0.0;
   const difference = parsedNewOdo - activeMotor.currentOdo;
@@ -43,7 +68,7 @@ export default function UpdateOdometerModal({
     <div className="modal-backdrop open" id="modal-update-odometer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 100 }}>
       <div className="modal-dialog" style={{ maxWidth: '400px', width: '90%', margin: '0 auto', background: 'var(--bg-surface-solid)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)' }}>
         <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)' }}>Update Odometer</h3>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t.updateTitle}</h3>
           <button className="btn-close-modal" onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
         </div>
         
@@ -56,12 +81,12 @@ export default function UpdateOdometerModal({
             )}
             
             <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Current Odometer</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t.currentOdo}</span>
               <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{activeMotor.currentOdo.toLocaleString('id-ID')} KM</strong>
             </div>
 
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>New Odometer (KM)</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.newOdo}</label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <input
                   type="number"
@@ -83,14 +108,14 @@ export default function UpdateOdometerModal({
                   </span>
                 )}
               </div>
-              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Enter the current odometer reading from your motorcycle dashboard.</small>
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{t.helpText}</small>
             </div>
           </div>
 
           <div className="modal-footer" style={{ display: 'flex', gap: '0.75rem', padding: '1rem 1.5rem', borderTop: '1px solid var(--border-color)', justifyContent: 'flex-end' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>Cancel</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>{t.cancel}</button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? t.saving : t.saveBtn}
             </button>
           </div>
         </form>

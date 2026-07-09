@@ -12,6 +12,7 @@ interface CustomDialogProps {
   confirmText?: string;
   cancelText?: string;
   isDanger?: boolean;
+  lang?: 'en' | 'id';
 }
 
 export default function CustomDialog({
@@ -21,11 +22,15 @@ export default function CustomDialog({
   message,
   onConfirm,
   onCancel,
-  confirmText = 'OK',
-  cancelText = 'Cancel',
-  isDanger = false
+  confirmText,
+  cancelText,
+  isDanger = false,
+  lang = 'en'
 }: CustomDialogProps) {
   if (!isOpen) return null;
+
+  const resolvedConfirmText = confirmText || 'OK';
+  const resolvedCancelText = cancelText || (lang === 'en' ? 'Cancel' : 'Batal');
 
   return (
     <div 
@@ -111,7 +116,7 @@ export default function CustomDialog({
               onClick={onCancel}
               style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
             >
-              {cancelText}
+              {resolvedCancelText}
             </button>
           )}
           <button 
@@ -120,7 +125,7 @@ export default function CustomDialog({
             onClick={onConfirm}
             style={{ fontSize: '0.85rem', padding: '0.5rem 1.25rem', fontWeight: 600 }}
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
       </div>

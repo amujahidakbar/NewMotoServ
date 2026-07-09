@@ -31,19 +31,108 @@ interface FuelTabProps {
     onCancel?: () => void,
     options?: { confirmText?: string; cancelText?: string; isDanger?: boolean }
   ) => void;
+  lang: 'en' | 'id';
 }
 
 // Format Date helper to prevent time zone shifts
-function formatDate(dateString: string) {
+function formatDate(dateString: string, lang: 'en' | 'id') {
   if (!dateString) return "-";
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const locale = lang === 'en' ? 'en-US' : 'id-ID';
   const [year, month, day] = dateString.split('-');
   if (year && month && day) {
     const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return d.toLocaleDateString('en-US', options);
+    return d.toLocaleDateString(locale, options);
   }
-  return new Date(dateString).toLocaleDateString('en-US', options);
+  return new Date(dateString).toLocaleDateString(locale, options);
 }
+
+const TRANSLATIONS = {
+  en: {
+    fuelTracker: "Fuel Efficiency Tracker",
+    fuelDesc: "Monitor fuel economy and gas expense records for your vehicles.",
+    noActiveMotor: "No Active Motorcycle",
+    noActiveMotorDesc: "Please select or add a motorcycle first to manage fuel logs.",
+    recordFuel: "Record Fuel",
+    averageConsumption: "Average Consumption",
+    requiresTwoLogs: "Requires at least 2 logs",
+    costPerKm: "Cost Per Kilometer",
+    trackedDistance: "Tracked distance",
+    totalFuelExpenses: "Total Fuel Expenses",
+    totalVolume: "Total volume",
+    fillups: "fill-ups",
+    dailyFuelConsumption: "Daily Fuel Consumption",
+    days: "days",
+    noData: "No data available",
+    fuelLogHistory: "Fuel Log History",
+    dateFilter: "Date Filter:",
+    allTime: "All Time",
+    last30: "Last 30 Days",
+    last90: "Last 90 Days",
+    thisYear: "This Year",
+    customRange: "Custom Range",
+    startDate: "Start Date",
+    endDate: "End Date",
+    noLogsRecorded: "No fuel logs recorded yet. Click \"Record Fuel\" above to log your first fill-up.",
+    noLogsInRange: "No fuel logs found for the selected date range.",
+    thDate: "Date",
+    thOdo: "Odometer",
+    thVolume: "Volume",
+    thCost: "Total Cost",
+    thPriceL: "Price/Liter",
+    thConsumption: "Consumption per KM",
+    thAction: "Action",
+    initialOdo: "Initial / Odo correction",
+    editLog: "Edit Log",
+    deleteLog: "Delete Log",
+    confirmDeleteTitle: "Delete Fuel Log",
+    confirmDeleteMsg: "Are you sure you want to delete the fuel log from {date} at odometer {odo} KM?",
+    deleteBtn: "Delete",
+    cancelBtn: "Cancel"
+  },
+  id: {
+    fuelTracker: "Pelacak Efisiensi BBM",
+    fuelDesc: "Pantau konsumsi bahan bakar dan catatan pengeluaran bensin kendaraan Anda.",
+    noActiveMotor: "Tidak Ada Motor Aktif",
+    noActiveMotorDesc: "Silakan pilih atau tambahkan sepeda motor terlebih dahulu untuk mencatat BBM.",
+    recordFuel: "Catat BBM",
+    averageConsumption: "Rata-rata Konsumsi",
+    requiresTwoLogs: "Membutuhkan minimal 2 log",
+    costPerKm: "Biaya per Kilometer",
+    trackedDistance: "Jarak terpantau",
+    totalFuelExpenses: "Total Pengeluaran BBM",
+    totalVolume: "Volume total",
+    fillups: "pengisian",
+    dailyFuelConsumption: "Konsumsi BBM Harian",
+    days: "hari",
+    noData: "Belum ada data",
+    fuelLogHistory: "Riwayat Pengisian BBM",
+    dateFilter: "Filter Waktu:",
+    allTime: "Semua Waktu",
+    last30: "30 Hari Terakhir",
+    last90: "90 Hari Terakhir",
+    thisYear: "Tahun Ini",
+    customRange: "Rentang Kustom",
+    startDate: "Tanggal Mulai",
+    endDate: "Tanggal Selesai",
+    noLogsRecorded: "Belum ada riwayat pengisian BBM. Klik \"Catat BBM\" di atas untuk pengisian pertama.",
+    noLogsInRange: "Tidak ada riwayat pengisian BBM dalam rentang waktu yang dipilih.",
+    thDate: "Tanggal",
+    thOdo: "Odometer",
+    thVolume: "Volume",
+    thCost: "Total Biaya",
+    thPriceL: "Harga/Liter",
+    thConsumption: "Konsumsi per KM",
+    thAction: "Aksi",
+    initialOdo: "Awal / Koreksi Odometer",
+    editLog: "Ubah Catatan",
+    deleteLog: "Hapus Catatan",
+    confirmDeleteTitle: "Hapus Catatan BBM",
+    confirmDeleteMsg: "Apakah Anda yakin ingin menghapus catatan BBM tanggal {date} pada odometer {odo} KM?",
+    deleteBtn: "Hapus",
+    cancelBtn: "Batal"
+  }
+};
 
 export default function FuelTab({
   activeMotor,
@@ -51,22 +140,24 @@ export default function FuelTab({
   onOpenAddFuelModal,
   onOpenEditFuelModal,
   onDeleteFuelLog,
-  showConfirm
+  showConfirm,
+  lang
 }: FuelTabProps) {
   const [timeRange, setTimeRange] = useState<'all' | '30' | '90' | 'year' | 'custom'>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   if (!activeMotor) {
     return (
       <section id="tab-bbm" className="tab-content active">
         <div className="section-header">
-          <h2>Fuel Efficiency Tracker</h2>
-          <p className="section-desc">Monitor fuel economy and gas expense records for your vehicles.</p>
+          <h2>{t.fuelTracker}</h2>
+          <p className="section-desc">{t.fuelDesc}</p>
         </div>
         <div className="empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 1.5rem' }}>
-          <h3>No Active Motorcycle</h3>
-          <p>Please select or add a motorcycle first to manage fuel logs.</p>
+          <h3>{t.noActiveMotor}</h3>
+          <p>{t.noActiveMotorDesc}</p>
         </div>
       </section>
     );
@@ -173,14 +264,15 @@ export default function FuelTab({
   }
 
   const handleDeleteClick = (id: string, date: string, odo: number) => {
+    const formattedDate = formatDate(date, lang);
     showConfirm(
-      'Delete Fuel Log',
-      `Are you sure you want to delete the fuel log from ${date} at odometer ${odo.toLocaleString('id-ID')} KM?`,
+      t.confirmDeleteTitle,
+      t.confirmDeleteMsg.replace('{date}', formattedDate).replace('{odo}', odo.toLocaleString('id-ID')),
       () => {
         onDeleteFuelLog(id);
       },
       undefined,
-      { confirmText: 'Delete', cancelText: 'Cancel', isDanger: true }
+      { confirmText: t.deleteBtn, cancelText: t.cancelBtn, isDanger: true }
     );
   };
 
@@ -188,56 +280,56 @@ export default function FuelTab({
     <section id="tab-bbm" className="tab-content active">
       <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <div>
-          <h2>Fuel Efficiency Tracker</h2>
-          <p className="section-desc">Monitor fuel economy and gas expense records for your vehicles.</p>
+          <h2>{t.fuelTracker}</h2>
+          <p className="section-desc">{t.fuelDesc}</p>
         </div>
         <button className="btn btn-primary btn-sm btn-icon" onClick={onOpenAddFuelModal}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>Record Fuel</span>
+          <span>{t.recordFuel}</span>
         </button>
       </div>
 
       {/* Stats Cards Grid */}
       <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Average Consumption</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.averageConsumption}</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
             {chronoLogs.length >= 2 ? `${avgKmL.toFixed(1)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>KM/L</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `${(avgLitersKm).toFixed(3)} L / KM` : 'Requires at least 2 logs'}
+            {chronoLogs.length >= 2 ? `${(avgLitersKm).toFixed(3)} L / KM` : t.requiresTwoLogs}
           </div>
         </div>
 
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Cost Per Kilometer</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.costPerKm}</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-warning)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `IDR ${Math.round(avgCostKm).toLocaleString('id-ID')}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
+            {chronoLogs.length >= 2 ? `Rp ${Math.round(avgCostKm).toLocaleString('id-ID')}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `Tracked distance: ${totalDistance.toLocaleString('id-ID')} KM` : 'Requires at least 2 logs'}
+            {chronoLogs.length >= 2 ? `${t.trackedDistance}: ${totalDistance.toLocaleString('id-ID')} KM` : t.requiresTwoLogs}
           </div>
         </div>
 
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Fuel Expenses</div>
-          <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
-            IDR {totalCost.toLocaleString('id-ID')}
-          </div>
-          <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Total volume: {totalLiters.toFixed(1)} Liters ({chronoLogs.length} fill-ups)
-          </div>
-        </div>
-
-        <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
-          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Daily Fuel Consumption</div>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.totalFuelExpenses}</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
-            {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/Day</small>
+            Rp {totalCost.toLocaleString('id-ID')}
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length > 0 ? `IDR ${Math.round(dailyCost).toLocaleString('id-ID')} / day (${totalDays} days)` : 'No data available'}
+            {t.totalVolume}: {totalLiters.toFixed(1)} L ({chronoLogs.length} {t.fillups})
+          </div>
+        </div>
+
+        <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
+          <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.dailyFuelConsumption}</div>
+          <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
+            {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/{lang === 'en' ? 'Day' : 'Hari'}</small>
+          </div>
+          <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            {chronoLogs.length > 0 ? `Rp ${Math.round(dailyCost).toLocaleString('id-ID')} / ${lang === 'en' ? 'day' : 'hari'} (${totalDays} ${t.days})` : t.noData}
           </div>
         </div>
       </div>
@@ -245,21 +337,21 @@ export default function FuelTab({
       {/* Fuel Log List Table */}
       <div className="card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Fuel Log History</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{t.fuelLogHistory}</h3>
           
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Date Filter:</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t.dateFilter}</label>
             <select 
               className="custom-select custom-select-sm"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as any)}
               style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}
             >
-              <option value="all">All Time</option>
-              <option value="30">Last 30 Days</option>
-              <option value="90">Last 90 Days</option>
-              <option value="year">This Year</option>
-              <option value="custom">Custom Range</option>
+              <option value="all">{t.allTime}</option>
+              <option value="30">{t.last30}</option>
+              <option value="90">{t.last90}</option>
+              <option value="year">{t.thisYear}</option>
+              <option value="custom">{t.customRange}</option>
             </select>
           </div>
         </div>
@@ -267,7 +359,7 @@ export default function FuelTab({
         {timeRange === 'custom' && (
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', marginBottom: '1.25rem', animation: 'fadeIn 0.2s ease-out' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Start Date</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.startDate}</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -277,7 +369,7 @@ export default function FuelTab({
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>End Date</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.endDate}</label>
               <input 
                 type="date" 
                 className="form-control" 
@@ -292,8 +384,8 @@ export default function FuelTab({
         {filteredMotorLogs.length === 0 ? (
           <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             {timeRange === 'all' 
-              ? 'No fuel logs recorded yet. Click "Record Fuel" above to log your first fill-up.'
-              : 'No fuel logs found for the selected date range.'
+              ? t.noLogsRecorded
+              : t.noLogsInRange
             }
           </div>
         ) : (
@@ -301,18 +393,17 @@ export default function FuelTab({
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 600 }}>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Date</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Odometer</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Volume</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Total Cost</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Price/Liter</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Consumption per KM</th>
-                  <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thDate}</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thOdo}</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thVolume}</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thCost}</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thPriceL}</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>{t.thConsumption}</th>
+                  <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>{t.thAction}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredMotorLogs.map((log, index) => {
-                  // To calculate efficiency, we look for the next chronological log (which is index+1 in chronoLogs, meaning index-1 in sorted motorLogs)
                   let tripKmL = 0;
                   let tripCostKm = 0;
                   let tripLitersKm = 0;
@@ -336,7 +427,7 @@ export default function FuelTab({
                   return (
                     <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <td style={{ padding: '0.75rem 0.5rem', whiteSpace: 'nowrap' }}>
-                        {formatDate(log.date)}
+                        {formatDate(log.date, lang)}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600 }}>
                         {log.odometer.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 1 })} KM
@@ -345,10 +436,10 @@ export default function FuelTab({
                         {log.liters.toFixed(2)} L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 500 }}>
-                        IDR {log.price.toLocaleString('id-ID')}
+                        Rp {log.price.toLocaleString('id-ID')}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        IDR {Math.round(pricePerLiter).toLocaleString('id-ID')}/L
+                        Rp {Math.round(pricePerLiter).toLocaleString('id-ID')}/L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem' }}>
                         {hasTripStats ? (
@@ -357,12 +448,12 @@ export default function FuelTab({
                               {tripKmL.toFixed(1)} KM/L
                             </span>
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                              IDR {Math.round(tripCostKm).toLocaleString('id-ID')}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
+                              Rp {Math.round(tripCostKm).toLocaleString('id-ID')}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
                             </span>
                           </div>
                         ) : (
                           <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                            Initial / Odo correction
+                            {t.initialOdo}
                           </span>
                         )}
                       </td>
@@ -370,7 +461,7 @@ export default function FuelTab({
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                           <button
                             className="btn btn-secondary btn-icon-only"
-                            title="Edit Log"
+                            title={t.editLog}
                             onClick={() => onOpenEditFuelModal(log)}
                             style={{
                               width: '28px',
@@ -387,7 +478,7 @@ export default function FuelTab({
                           </button>
                           <button
                             className="btn btn-secondary btn-icon-only"
-                            title="Delete Log"
+                            title={t.deleteLog}
                             onClick={() => handleDeleteClick(log.id, log.date, log.odometer)}
                             style={{
                               width: '28px',

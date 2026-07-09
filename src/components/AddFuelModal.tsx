@@ -28,13 +28,58 @@ interface AddFuelModalProps {
     liters: number;
     price: number;
   }) => Promise<boolean>;
+  lang: 'en' | 'id';
 }
+
+const TRANSLATIONS = {
+  en: {
+    editTitle: "Edit Fuel Log",
+    recordTitle: "Record Fuel Fill-up",
+    invalidOdo: "Invalid Odometer!",
+    errorVolume: "Fuel volume must be greater than 0 Liters!",
+    errorCost: "Total cost must be greater than IDR 0!",
+    errorFailedSave: "Failed to save fuel log to database.",
+    errorSystem: "System error occurred.",
+    activeMotor: "Active Motorcycle",
+    fillupDate: "Fill-up Date",
+    odoLabel: "Odometer (KM)",
+    volumeLabel: "Volume (Liters)",
+    costLabel: "Total Cost (IDR)",
+    estimatedPrice: "Estimated Price:",
+    perLiter: "/ Liter",
+    cancel: "Cancel",
+    saving: "Saving...",
+    saveChanges: "Save Changes",
+    saveLog: "Save Log"
+  },
+  id: {
+    editTitle: "Ubah Catatan BBM",
+    recordTitle: "Catat Pengisian BBM",
+    invalidOdo: "Odometer tidak valid!",
+    errorVolume: "Volume bensin harus lebih besar dari 0 Liter!",
+    errorCost: "Total biaya harus lebih besar dari Rp 0!",
+    errorFailedSave: "Gagal menyimpan catatan BBM ke database.",
+    errorSystem: "Terjadi kesalahan sistem.",
+    activeMotor: "Motor Aktif",
+    fillupDate: "Tanggal Pengisian",
+    odoLabel: "Odometer (KM)",
+    volumeLabel: "Volume (Liter)",
+    costLabel: "Total Biaya (Rp)",
+    estimatedPrice: "Estimasi Harga:",
+    perLiter: "/ Liter",
+    cancel: "Batal",
+    saving: "Menyimpan...",
+    saveChanges: "Simpan Perubahan",
+    saveLog: "Simpan Catatan"
+  }
+};
 
 export default function AddFuelModal({
   activeMotor,
   editingLog,
   onClose,
-  onAdd
+  onAdd,
+  lang
 }: AddFuelModalProps) {
   const [date, setDate] = useState(() => {
     if (editingLog) return editingLog.date;
@@ -56,6 +101,8 @@ export default function AddFuelModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -65,17 +112,17 @@ export default function AddFuelModal({
     const parsedPrice = parseInt(price);
 
     if (isNaN(parsedOdo) || parsedOdo < 0) {
-      setError('Invalid Odometer!');
+      setError(t.invalidOdo);
       return;
     }
 
     if (isNaN(parsedLiters) || parsedLiters <= 0) {
-      setError('Fuel volume must be greater than 0 Liters!');
+      setError(t.errorVolume);
       return;
     }
 
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
-      setError('Total cost must be greater than IDR 0!');
+      setError(t.errorCost);
       return;
     }
 
@@ -91,10 +138,10 @@ export default function AddFuelModal({
       if (success) {
         onClose();
       } else {
-        setError('Failed to save fuel log to database.');
+        setError(t.errorFailedSave);
       }
     } catch (err: any) {
-      setError(err.message || 'System error occurred.');
+      setError(err.message || t.errorSystem);
     } finally {
       setLoading(false);
     }
@@ -106,7 +153,7 @@ export default function AddFuelModal({
         
         <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-            {editingLog ? 'Edit Fuel Log' : 'Record Fuel Fill-up'}
+            {editingLog ? t.editTitle : t.recordTitle}
           </h3>
           <button 
             onClick={onClose} 
@@ -126,7 +173,7 @@ export default function AddFuelModal({
             )}
 
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Active Motorcycle</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.activeMotor}</label>
               <input
                 type="text"
                 className="form-control"
@@ -138,7 +185,7 @@ export default function AddFuelModal({
 
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Fill-up Date</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.fillupDate}</label>
                 <input
                   type="date"
                   className="form-control"
@@ -150,7 +197,7 @@ export default function AddFuelModal({
               </div>
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Odometer (KM)</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.odoLabel}</label>
                 <input
                   type="number"
                   className="form-control"
@@ -167,7 +214,7 @@ export default function AddFuelModal({
 
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Volume (Liters)</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.volumeLabel}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -182,7 +229,7 @@ export default function AddFuelModal({
               </div>
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Total Cost (IDR)</label>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.costLabel}</label>
                 <input
                   type="number"
                   className="form-control"
@@ -198,7 +245,7 @@ export default function AddFuelModal({
             
             {liters && price && !isNaN(parseFloat(liters)) && !isNaN(parseInt(price)) && (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.01)', padding: '0.65rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', textAlign: 'center' }}>
-                Estimated Price: <strong>IDR {Math.round(parseInt(price) / parseFloat(liters)).toLocaleString('id-ID')} / Liter</strong>
+                {t.estimatedPrice} <strong>Rp {Math.round(parseInt(price) / parseFloat(liters)).toLocaleString('id-ID')} {t.perLiter}</strong>
               </div>
             )}
           </div>
@@ -211,7 +258,7 @@ export default function AddFuelModal({
               disabled={loading}
               style={{ padding: '0.5rem 1rem' }}
             >
-              Cancel
+              {t.cancel}
             </button>
             <button 
               type="submit" 
@@ -219,7 +266,7 @@ export default function AddFuelModal({
               disabled={loading}
               style={{ padding: '0.5rem 1rem', fontWeight: 600 }}
             >
-              {loading ? 'Saving...' : (editingLog ? 'Save Changes' : 'Save Log')}
+              {loading ? t.saving : (editingLog ? t.saveChanges : t.saveLog)}
             </button>
           </div>
         </form>

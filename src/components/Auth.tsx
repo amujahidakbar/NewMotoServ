@@ -4,9 +4,47 @@ import React, { useState } from 'react';
 
 interface AuthProps {
   onAuthSuccess: (user: { id: number; name: string; email: string }) => void;
+  lang: 'en' | 'id';
 }
 
-export default function Auth({ onAuthSuccess }: AuthProps) {
+const TRANSLATIONS = {
+  en: {
+    loginSubtitle: "Sign in to your motorcycle garage",
+    registerSubtitle: "Create your new garage account",
+    fullName: "Full Name",
+    emailAddress: "Email Address",
+    password: "Password",
+    processing: "Processing...",
+    signInBtn: "Sign In",
+    registerBtn: "Register",
+    dontHaveAccount: "Don't have an account?",
+    registerHere: "Register here",
+    alreadyHaveAccount: "Already have an account?",
+    signInHere: "Sign in here",
+    errorRequired: "An error occurred while processing your request.",
+    errorConnection: "A connection error occurred.",
+    enterName: "Enter your name"
+  },
+  id: {
+    loginSubtitle: "Masuk ke garasi motor Anda",
+    registerSubtitle: "Buat akun garasi baru Anda",
+    fullName: "Nama Lengkap",
+    emailAddress: "Alamat Email",
+    password: "Kata Sandi",
+    processing: "Memproses...",
+    signInBtn: "Masuk",
+    registerBtn: "Daftar",
+    dontHaveAccount: "Belum punya akun?",
+    registerHere: "Daftar di sini",
+    alreadyHaveAccount: "Sudah punya akun?",
+    signInHere: "Masuk di sini",
+    errorRequired: "Terjadi kesalahan saat memproses permintaan Anda.",
+    errorConnection: "Terjadi kesalahan koneksi.",
+    enterName: "Masukkan nama Anda"
+  }
+};
+
+export default function Auth({ onAuthSuccess, lang }: AuthProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -15,6 +53,8 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +76,12 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'An error occurred while processing your request.');
+        throw new Error(data.error || t.errorRequired);
       }
 
       onAuthSuccess(data.user);
     } catch (err: any) {
-      setError(err.message || 'A connection error occurred.');
+      setError(err.message || t.errorConnection);
     } finally {
       setLoading(false);
     }
@@ -58,7 +98,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             </svg>
           </div>
           <h2>Moto<span>Serv</span></h2>
-          <p>{mode === 'login' ? 'Sign in to your motorcycle garage' : 'Create your new garage account'}</p>
+          <p>{mode === 'login' ? t.loginSubtitle : t.registerSubtitle}</p>
         </div>
 
         {error && (
@@ -75,11 +115,11 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {mode === 'register' && (
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Full Name</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.fullName}</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Enter your name"
+                placeholder={t.enterName}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -89,7 +129,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
           )}
 
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Email Address</label>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.emailAddress}</label>
             <input
               type="email"
               className="form-control"
@@ -102,7 +142,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
           </div>
 
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Password</label>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{t.password}</label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -155,10 +195,10 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             {loading ? (
               <>
                 <span className="spinner-small" style={{ width: '16px', height: '16px' }}></span>
-                <span>Processing...</span>
+                <span>{t.processing}</span>
               </>
             ) : (
-              <span>{mode === 'login' ? 'Sign In' : 'Register'}</span>
+              <span>{mode === 'login' ? t.signInBtn : t.registerBtn}</span>
             )}
           </button>
         </form>
@@ -166,13 +206,13 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         <div className="auth-footer">
           {mode === 'login' ? (
             <>
-              Don't have an account?
-              <button className="auth-link" onClick={() => { setMode('register'); setError(null); }}>Register here</button>
+              {t.dontHaveAccount}{' '}
+              <button className="auth-link" onClick={() => { setMode('register'); setError(null); }}>{t.registerHere}</button>
             </>
           ) : (
             <>
-              Already have an account?
-              <button className="auth-link" onClick={() => { setMode('login'); setError(null); }}>Sign in here</button>
+              {t.alreadyHaveAccount}{' '}
+              <button className="auth-link" onClick={() => { setMode('login'); setError(null); }}>{t.signInHere}</button>
             </>
           )}
         </div>
