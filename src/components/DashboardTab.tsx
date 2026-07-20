@@ -241,11 +241,9 @@ export default function DashboardTab({
   }
 
   // 2. Calculate health metrics for valid components only
-  const defaultComponents = getComponentsForType(activeMotor.type) as string[];
-  const customComponents = Object.keys(activeMotor.intervals || {}).filter(
-    comp => !defaultComponents.includes(comp)
-  );
-  const allowedComponents = [...defaultComponents, ...customComponents];
+  const allowedComponents = Object.keys(activeMotor.intervals || {}).length > 0
+    ? Object.keys(activeMotor.intervals)
+    : (getComponentsForType(activeMotor.type) as string[]);
   const filteredIntervals: Record<string, number> = {};
   const filteredLastService: Record<string, number> = {};
 

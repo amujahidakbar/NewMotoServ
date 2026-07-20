@@ -402,11 +402,9 @@ export default function SettingsTab({
     );
   };
 
-  const defaultComponents = getComponentsForType(activeMotor.type || 'kopling') as string[];
-  const customComponents = Object.keys(activeMotor.intervals || {}).filter(
-    comp => !defaultComponents.includes(comp)
-  );
-  const components = [...defaultComponents, ...customComponents];
+  const components = Object.keys(activeMotor.intervals || {}).length > 0
+    ? Object.keys(activeMotor.intervals)
+    : (getComponentsForType(activeMotor.type || 'kopling') as string[]);
 
   return (
     <section id="tab-pengaturan" className="tab-content active">
@@ -425,36 +423,33 @@ export default function SettingsTab({
           <div id="settings-view-container">
             <div className="form-grid" id="settings-intervals-view" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
               {components.map(comp => {
-                const isCustom = customComponents.includes(comp);
                 return (
                   <div key={comp} className="form-group" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
                       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500, margin: 0 }}>
                         {getComponentDisplayName(comp, lang)}
                       </label>
-                      {isCustom && (
-                        <button
-                          type="button"
-                          onClick={() => onOpenRenameModal(comp)}
-                          title={lang === 'en' ? 'Rename Component' : 'Ganti Nama Komponen'}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--color-primary)',
-                            cursor: 'pointer',
-                            padding: '0.1rem 0.2rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            opacity: 0.7,
-                            transition: 'opacity 0.2s'
-                          }}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-                          </svg>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => onOpenRenameModal(comp)}
+                        title={lang === 'en' ? 'Rename Component' : 'Ganti Nama Komponen'}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--color-primary)',
+                          cursor: 'pointer',
+                          padding: '0.1rem 0.2rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: 0.7,
+                          transition: 'opacity 0.2s'
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                        </svg>
+                      </button>
                     </div>
                     <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>
                       {(activeMotor.intervals[comp] || 0).toLocaleString('id-ID')} <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>KM</span>
