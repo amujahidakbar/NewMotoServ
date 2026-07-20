@@ -23,7 +23,8 @@ const TRANSLATIONS = {
     helpText: "Enter the current odometer reading from your motorcycle dashboard.",
     cancel: "Cancel",
     saving: "Saving...",
-    saveBtn: "Save Changes"
+    saveBtn: "Save Changes",
+    difference: "Difference:"
   },
   id: {
     updateTitle: "Update Odometer",
@@ -32,7 +33,8 @@ const TRANSLATIONS = {
     helpText: "Masukkan pembacaan odometer saat ini dari dasbor motor Anda.",
     cancel: "Batal",
     saving: "Menyimpan...",
-    saveBtn: "Simpan Perubahan"
+    saveBtn: "Simpan Perubahan",
+    difference: "Selisih Jarak:"
   }
 };
 
@@ -82,7 +84,7 @@ export default function UpdateOdometerModal({
             
             <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t.currentOdo}</span>
-              <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{activeMotor.currentOdo.toLocaleString('id-ID')} KM</strong>
+              <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{activeMotor.currentOdo.toLocaleString(lang === 'en' ? 'en-US' : 'id-ID')} KM</strong>
             </div>
 
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
@@ -104,7 +106,7 @@ export default function UpdateOdometerModal({
                 />
                 {difference !== 0 && (
                   <span style={{ position: 'absolute', right: '1rem', fontSize: '0.8rem', color: difference > 0 ? 'var(--color-primary)' : 'var(--color-danger)', fontWeight: '600' }}>
-                    {difference > 0 ? `+${difference.toLocaleString('id-ID', { maximumFractionDigits: 1 })}` : difference.toLocaleString('id-ID', { maximumFractionDigits: 1 })} KM
+                    {difference > 0 ? `+${difference.toLocaleString(lang === 'en' ? 'en-US' : 'id-ID', { maximumFractionDigits: 1 })}` : difference.toLocaleString(lang === 'en' ? 'en-US' : 'id-ID', { maximumFractionDigits: 1 })} KM
                   </span>
                 )}
               </div>

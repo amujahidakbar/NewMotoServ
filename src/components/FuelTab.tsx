@@ -47,6 +47,11 @@ function formatDate(dateString: string, lang: 'en' | 'id') {
   return new Date(dateString).toLocaleDateString(locale, options);
 }
 
+function formatCurrency(amount: number, lang: 'en' | 'id') {
+  const locale = lang === 'en' ? 'en-US' : 'id-ID';
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+}
+
 const TRANSLATIONS = {
   en: {
     fuelTracker: "Fuel Efficiency Tracker",
@@ -306,7 +311,7 @@ export default function FuelTab({
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
           <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.costPerKm}</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-warning)', marginTop: '0.25rem' }}>
-            {chronoLogs.length >= 2 ? `Rp ${Math.round(avgCostKm).toLocaleString('id-ID')}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
+            {chronoLogs.length >= 2 ? `${formatCurrency(Math.round(avgCostKm), lang)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>/KM</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
             {chronoLogs.length >= 2 ? `${t.trackedDistance}: ${totalDistance.toLocaleString('id-ID')} KM` : t.requiresTwoLogs}
@@ -316,7 +321,7 @@ export default function FuelTab({
         <div className="card overview-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: 'var(--radius-md)' }}>
           <div className="card-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t.totalFuelExpenses}</div>
           <div className="card-value" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.25rem' }}>
-            Rp {totalCost.toLocaleString('id-ID')}
+            {formatCurrency(totalCost, lang)}
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
             {t.totalVolume}: {totalLiters.toFixed(1)} L ({chronoLogs.length} {t.fillups})
@@ -329,7 +334,7 @@ export default function FuelTab({
             {chronoLogs.length > 0 ? `${dailyLiters.toFixed(2)}` : 'N/A'} <small style={{ fontSize: '0.9rem', fontWeight: 500 }}>L/{lang === 'en' ? 'Day' : 'Hari'}</small>
           </div>
           <div className="card-subtext" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {chronoLogs.length > 0 ? `Rp ${Math.round(dailyCost).toLocaleString('id-ID')} / ${lang === 'en' ? 'day' : 'hari'} (${totalDays} ${t.days})` : t.noData}
+            {chronoLogs.length > 0 ? `${formatCurrency(Math.round(dailyCost), lang)} / ${lang === 'en' ? 'day' : 'hari'} (${totalDays} ${t.days})` : t.noData}
           </div>
         </div>
       </div>
@@ -436,10 +441,10 @@ export default function FuelTab({
                         {log.liters.toFixed(2)} L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 500 }}>
-                        Rp {log.price.toLocaleString('id-ID')}
+                        {formatCurrency(log.price, lang)}
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        Rp {Math.round(pricePerLiter).toLocaleString('id-ID')}/L
+                        {formatCurrency(Math.round(pricePerLiter), lang)}/L
                       </td>
                       <td style={{ padding: '0.75rem 0.5rem' }}>
                         {hasTripStats ? (
@@ -448,7 +453,7 @@ export default function FuelTab({
                               {tripKmL.toFixed(1)} KM/L
                             </span>
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                              Rp {Math.round(tripCostKm).toLocaleString('id-ID')}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
+                              {formatCurrency(Math.round(tripCostKm), lang)}/KM &bull; {tripLitersKm.toFixed(3)} L/KM
                             </span>
                           </div>
                         ) : (

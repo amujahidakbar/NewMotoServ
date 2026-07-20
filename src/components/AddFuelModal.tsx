@@ -74,6 +74,11 @@ const TRANSLATIONS = {
   }
 };
 
+function formatCurrency(amount: number, lang: 'en' | 'id') {
+  const locale = lang === 'en' ? 'en-US' : 'id-ID';
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+}
+
 export default function AddFuelModal({
   activeMotor,
   editingLog,
@@ -245,7 +250,7 @@ export default function AddFuelModal({
             
             {liters && price && !isNaN(parseFloat(liters)) && !isNaN(parseInt(price)) && (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.01)', padding: '0.65rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', textAlign: 'center' }}>
-                {t.estimatedPrice} <strong>Rp {Math.round(parseInt(price) / parseFloat(liters)).toLocaleString('id-ID')} {t.perLiter}</strong>
+                {t.estimatedPrice} <strong>{formatCurrency(Math.round(parseInt(price) / parseFloat(liters)), lang)} {t.perLiter}</strong>
               </div>
             )}
           </div>

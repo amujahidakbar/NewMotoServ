@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getComponentsForType } from '@/lib/constants';
+import { getComponentsForType, getComponentDisplayName } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -213,7 +213,7 @@ export default function AddServiceModal({
                       onChange={() => handleCheckboxChange(comp)}
                       style={{ cursor: 'pointer', accentColor: 'var(--color-primary)' }}
                     />
-                    <span>{comp}</span>
+                    <span>{getComponentDisplayName(comp, lang)}</span>
                   </label>
                 ))}
               </div>

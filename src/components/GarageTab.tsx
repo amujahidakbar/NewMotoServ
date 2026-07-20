@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { calculateMotorHealth } from '@/lib/calculations';
+import { getMotorTypeDisplayName } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -135,7 +136,7 @@ export default function GarageTab({
                   </div>
                   <div>
                     <h3 className="motor-card-title">{motor.name}</h3>
-                    <span className="badge" style={{ textTransform: 'capitalize' }}>{motor.type}</span>
+                    <span className="badge" style={{ textTransform: 'capitalize' }}>{getMotorTypeDisplayName(motor.type, lang)}</span>
                   </div>
                 </div>
 

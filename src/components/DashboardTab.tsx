@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { calculateMotorHealth, ComponentHealth } from '@/lib/calculations';
-import { getComponentsForType } from '@/lib/constants';
+import { getComponentsForType, getComponentDisplayName, getMotorTypeDisplayName } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -334,7 +334,7 @@ export default function DashboardTab({
         <div className="overview-details">
           <h3 className="motor-name-display" id="info-motor-name">{activeMotor.name}</h3>
           <div className="motor-meta">
-            <span className="badge" id="info-motor-type" style={{ textTransform: 'capitalize' }}>{activeMotor.type}</span>
+            <span className="badge" id="info-motor-type" style={{ textTransform: 'capitalize' }}>{getMotorTypeDisplayName(activeMotor.type, lang)}</span>
             {activeMotor.plate && <span className="plate-number" id="info-motor-plate">{activeMotor.plate}</span>}
           </div>
           <div className="status-indicator-box">
@@ -377,7 +377,7 @@ export default function DashboardTab({
                   <div className="part-icon">
                     {getComponentIcon(comp.name)}
                   </div>
-                  <div className="part-title">{comp.name}</div>
+                  <div className="part-title">{getComponentDisplayName(comp.name, lang)}</div>
                 </div>
                 <span className="part-badge">{badgeText}</span>
               </div>

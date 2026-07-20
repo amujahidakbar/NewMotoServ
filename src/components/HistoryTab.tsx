@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getComponentDisplayName } from '@/lib/constants';
 
 interface ServiceLog {
   id: string;
@@ -226,7 +227,7 @@ export default function HistoryTab({
             >
               <option value="all">{t.allComponents}</option>
               {componentFilterOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>{getComponentDisplayName(opt, lang)}</option>
               ))}
             </select>
           </div>
@@ -323,7 +324,7 @@ export default function HistoryTab({
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                         {log.components.map(comp => (
                           <span key={comp} className="badge badge-outline" style={{ fontSize: '0.75rem', padding: '0.15rem 0.45rem' }}>
-                            {comp}
+                            {getComponentDisplayName(comp, lang)}
                           </span>
                         ))}
                       </div>

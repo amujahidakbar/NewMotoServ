@@ -14,6 +14,7 @@ import AddMotorcycleModal from '@/components/AddMotorcycleModal';
 import UpdateOdometerModal from '@/components/UpdateOdometerModal';
 import AddServiceModal from '@/components/AddServiceModal';
 import AddCustomComponentModal from '@/components/AddCustomComponentModal';
+import RenameComponentModal from '@/components/RenameComponentModal';
 import CustomDialog from '@/components/CustomDialog';
 import { DEFAULT_INTERVALS, normalizeMotorType } from '@/lib/constants';
 
@@ -74,6 +75,8 @@ export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [preselectedCompForService, setPreselectedCompForService] = useState<string | undefined>(undefined);
   const [isAddCustomCompOpen, setIsAddCustomCompOpen] = useState(false);
+  const [isRenameComponentOpen, setIsRenameComponentOpen] = useState(false);
+  const [componentToRename, setComponentToRename] = useState<string | null>(null);
   const [isPushEnabled, setIsPushEnabled] = useState(false);
 
   // Custom dialogs state
@@ -603,6 +606,126 @@ export default function Home() {
         return updated;
       });
       showCustomAlert('Success', 'New component successfully added locally!');
+      return true;
+    }
+  };
+
+  // 10.b_rename Rename component handler
+  const handleRenameComponent = async (oldName: string, newName: string) => {
+    if (user) {
+      try {
+        const res = await fetch('/api/intervals', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            motorcycleId: activeMotorcycleId,
+            oldName,
+            newName
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        setMotorcycles(prev =>
+          prev.map(m => {
+            if (m.id === activeMotorcycleId) {
+              const updatedIntervals = { ...m.intervals };
+              const updatedLastService = { ...m.lastService };
+              
+              if (updatedIntervals[oldName] !== undefined) {
+                updatedIntervals[newName] = updatedIntervals[oldName];
+                delete updatedIntervals[oldName];
+              }
+              if (updatedLastService[oldName] !== undefined) {
+                updatedLastService[newName] = updatedLastService[oldName];
+                delete updatedLastService[oldName];
+              }
+
+              return {
+                ...m,
+                intervals: updatedIntervals,
+                lastService: updatedLastService
+              };
+            }
+            return m;
+          })
+        );
+
+        setLogs(prev =>
+          prev.map(log => {
+            if (log.motorcycleId === activeMotorcycleId && log.components.includes(oldName)) {
+              return {
+                ...log,
+                components: log.components.map(c => c === oldName ? newName : c)
+              };
+            }
+            return log;
+          })
+        );
+
+        showCustomAlert('Success', 'Component successfully renamed!');
+        return true;
+      } catch (err: any) {
+        showCustomAlert('Error', err.message || 'Failed to rename component.');
+        return false;
+      }
+    } else {
+      let duplicate = false;
+      setMotorcycles(prev => {
+        const active = prev.find(m => m.id === activeMotorcycleId);
+        if (active && active.intervals && Object.keys(active.intervals).some(comp => comp.toLowerCase() === newName.toLowerCase())) {
+          duplicate = true;
+          return prev;
+        }
+
+        const updated = prev.map(m => {
+          if (m.id === activeMotorcycleId) {
+            const updatedIntervals = { ...m.intervals };
+            const updatedLastService = { ...m.lastService };
+            
+            if (updatedIntervals[oldName] !== undefined) {
+              updatedIntervals[newName] = updatedIntervals[oldName];
+              delete updatedIntervals[oldName];
+            }
+            if (updatedLastService[oldName] !== undefined) {
+              updatedLastService[newName] = updatedLastService[oldName];
+              delete updatedLastService[oldName];
+            }
+
+            return {
+              ...m,
+              intervals: updatedIntervals,
+              lastService: updatedLastService
+            };
+          }
+          return m;
+        });
+        if (!duplicate) {
+          localStorage.setItem('motoserv_guest_motorcycles', JSON.stringify(updated));
+        }
+        return updated;
+      });
+
+      if (duplicate) {
+        showCustomAlert('Error', lang === 'en' ? 'A component with this name already exists!' : 'Komponen dengan nama ini sudah terdaftar!');
+        return false;
+      }
+
+      setLogs(prev => {
+        const updated = prev.map(log => {
+          if (log.motorcycleId === activeMotorcycleId && log.components.includes(oldName)) {
+            return {
+              ...log,
+              components: log.components.map(c => c === oldName ? newName : c)
+            };
+          }
+          return log;
+        });
+        localStorage.setItem('motoserv_guest_service_logs', JSON.stringify(updated));
+        return updated;
+      });
+
+      showCustomAlert('Success', 'Component successfully renamed locally!');
       return true;
     }
   };
@@ -1187,6 +1310,11 @@ export default function Home() {
             onSubscribeNotifications={handleSubscribeNotifications}
             showAlert={showCustomAlert}
             showConfirm={showCustomConfirm}
+            onRenameComponent={handleRenameComponent}
+            onOpenRenameModal={(compName: string) => {
+              setComponentToRename(compName);
+              setIsRenameComponentOpen(true);
+            }}
             lang={lang}
           />
         )}
@@ -1373,6 +1501,18 @@ export default function Home() {
             </svg>
           </button>
         </div>
+      )}
+
+      {isRenameComponentOpen && componentToRename && (
+        <RenameComponentModal
+          oldName={componentToRename}
+          onClose={() => {
+            setIsRenameComponentOpen(false);
+            setComponentToRename(null);
+          }}
+          onRename={(newName) => handleRenameComponent(componentToRename, newName)}
+          lang={lang}
+        />
       )}
 
       {/* CUSTOM DIALOG */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getComponentsForType } from '@/lib/constants';
+import { getComponentsForType, getComponentDisplayName, getMotorTypeDisplayName } from '@/lib/constants';
 
 interface Motorcycle {
   id: string;
@@ -28,6 +28,8 @@ interface SettingsTabProps {
     onCancel?: () => void,
     options?: { confirmText?: string; cancelText?: string; isDanger?: boolean }
   ) => void;
+  onRenameComponent: (oldName: string, newName: string) => Promise<boolean>;
+  onOpenRenameModal: (componentName: string) => void;
   lang: 'en' | 'id';
 }
 
@@ -178,6 +180,8 @@ export default function SettingsTab({
   onSubscribeNotifications,
   showAlert,
   showConfirm,
+  onRenameComponent,
+  onOpenRenameModal,
   lang
 }: SettingsTabProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -414,20 +418,50 @@ export default function SettingsTab({
       <div className="settings-card">
         <div className="settings-card-header">
           <h3>{t.customizeIntervals}</h3>
-          <span className="active-motor-tag" id="settings-motor-tag" style={{ textTransform: 'capitalize' }}>{t.activeBike}: {activeMotor.name} ({activeMotor.type})</span>
+          <span className="active-motor-tag" id="settings-motor-tag" style={{ textTransform: 'capitalize' }}>{t.activeBike}: {activeMotor.name} ({getMotorTypeDisplayName(activeMotor.type, lang)})</span>
         </div>
 
         {!isEditing ? (
           <div id="settings-view-container">
             <div className="form-grid" id="settings-intervals-view" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
-              {components.map(comp => (
-                <div key={comp} className="form-group" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)' }}>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: '0.2rem' }}>{comp}</label>
-                  <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                    {(activeMotor.intervals[comp] || 0).toLocaleString('id-ID')} <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>KM</span>
-                  </strong>
-                </div>
-              ))}
+              {components.map(comp => {
+                const isCustom = customComponents.includes(comp);
+                return (
+                  <div key={comp} className="form-group" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500, margin: 0 }}>
+                        {getComponentDisplayName(comp, lang)}
+                      </label>
+                      {isCustom && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenRenameModal(comp)}
+                          title={lang === 'en' ? 'Rename Component' : 'Ganti Nama Komponen'}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--color-primary)',
+                            cursor: 'pointer',
+                            padding: '0.1rem 0.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0.7,
+                            transition: 'opacity 0.2s'
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+                      {(activeMotor.intervals[comp] || 0).toLocaleString('id-ID')} <span style={{ fontSize: '0.8rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>KM</span>
+                    </strong>
+                  </div>
+                );
+              })}
             </div>
             <div className="settings-actions" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <button 
@@ -463,7 +497,7 @@ export default function SettingsTab({
             <div className="form-grid" id="settings-intervals-inputs" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
               {components.map(comp => (
                 <div key={comp} className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{comp}</label>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{getComponentDisplayName(comp, lang)}</label>
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                     <input
                       type="number"
@@ -759,7 +793,7 @@ export default function SettingsTab({
                 <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                   {adminStats.motorcycleTypes.map(tData => (
                     <div key={tData.type} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                      <span className="badge" style={{ textTransform: 'capitalize', padding: '0.15rem 0.4rem', fontSize: '0.7rem' }}>{tData.type}</span>
+                      <span className="badge" style={{ textTransform: 'capitalize', padding: '0.15rem 0.4rem', fontSize: '0.7rem' }}>{getMotorTypeDisplayName(tData.type, lang)}</span>
                       <strong>{tData.count} {lang === 'en' ? 'unit(s)' : 'unit'}</strong>
                     </div>
                   ))}
@@ -787,9 +821,16 @@ export default function SettingsTab({
                         borderRadius: '4px', 
                         background: fb.type.includes('Bug') ? 'rgba(239, 68, 68, 0.1)' : fb.type.includes('New') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 255, 255, 0.05)',
                         color: fb.type.includes('Bug') ? 'var(--color-danger)' : fb.type.includes('New') ? 'var(--color-success)' : 'var(--text-secondary)',
-                        fontWeight: 600
                       }}>
-                        {fb.type}
+                        {fb.type === 'Bug / Issue' 
+                          ? (lang === 'en' ? 'Bug / Issue' : 'Bug / Masalah')
+                          : fb.type === 'New Feature'
+                          ? (lang === 'en' ? 'New Feature' : 'Fitur Baru')
+                          : fb.type === 'Design Suggestion'
+                          ? (lang === 'en' ? 'Design Suggestion' : 'Saran Desain')
+                          : fb.type === 'Other'
+                          ? (lang === 'en' ? 'Other' : 'Lainnya')
+                          : fb.type}
                       </span>
                     </div>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', margin: '0.5rem 0 0.75rem 0', lineHeight: '1.4' }}>

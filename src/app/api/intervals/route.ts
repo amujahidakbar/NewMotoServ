@@ -153,3 +153,95 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const user = getUserFromRequest(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { motorcycleId, oldName, newName } = await req.json();
+
+    if (!motorcycleId || !oldName || !newName) {
+      return NextResponse.json(
+        { error: 'Motor, nama lama, dan nama baru wajib diisi!' },
+        { status: 400 }
+      );
+    }
+
+    const trimmedOld = oldName.trim();
+    const trimmedNew = newName.trim();
+    if (!trimmedOld || !trimmedNew) {
+      return NextResponse.json({ error: 'Nama komponen tidak boleh kosong!' }, { status: 400 });
+    }
+
+    if (trimmedOld.toLowerCase() === trimmedNew.toLowerCase()) {
+      return NextResponse.json({ message: 'Nama komponen tidak berubah.' });
+    }
+
+    const motors = await db.query(
+      'SELECT id FROM motorcycles WHERE id = ? AND user_id = ?',
+      [motorcycleId, user.id]
+    ) as any[];
+
+    if (!motors || motors.length === 0) {
+      return NextResponse.json({ error: 'Sepeda motor tidak ditemukan!' }, { status: 404 });
+    }
+
+    const existing = await db.query(
+      'SELECT id FROM intervals WHERE motorcycle_id = ? AND LOWER(component_name) = ?',
+      [motorcycleId, trimmedNew.toLowerCase()]
+    ) as any[];
+
+    if (existing && existing.length > 0) {
+      return NextResponse.json(
+        { error: 'Komponen dengan nama baru ini sudah terdaftar!' },
+        { status: 400 }
+      );
+    }
+
+    await db.query(
+      'UPDATE intervals SET component_name = ? WHERE motorcycle_id = ? AND component_name = ?',
+      [trimmedNew, motorcycleId, trimmedOld]
+    );
+
+    await db.query(
+      'UPDATE last_services SET component_name = ? WHERE motorcycle_id = ? AND component_name = ?',
+      [trimmedNew, motorcycleId, trimmedOld]
+    );
+
+    const logs = await db.query(
+      'SELECT id, components FROM service_history WHERE motorcycle_id = ?',
+      [motorcycleId]
+    ) as any[];
+
+    for (const log of logs) {
+      let comps: string[] = [];
+      try {
+        comps = JSON.parse(log.components);
+      } catch (e) {
+        comps = typeof log.components === 'string' ? log.components.split(',') : [];
+      }
+      
+      const index = comps.indexOf(trimmedOld);
+      if (index !== -1) {
+        comps[index] = trimmedNew;
+        await db.query(
+          'UPDATE service_history SET components = ? WHERE id = ?',
+          [JSON.stringify(comps), log.id]
+        );
+      }
+    }
+
+    return NextResponse.json({ message: 'Komponen kustom berhasil diganti namanya!' });
+
+  } catch (error: any) {
+    console.error('Rename Component API Error:', error);
+    return NextResponse.json(
+      { error: 'Gagal mengganti nama komponen.' },
+      { status: 500 }
+    );
+  }
+}
+
