@@ -351,7 +351,7 @@ export default function DashboardTab({
       </div>
       <div className="parts-grid" id="parts-status-grid" style={{ display: 'grid' }}>
         {componentsHealth.map((comp) => {
-          let cardStatusClass = '';
+          let cardStatusClass = 'status-good';
           let badgeText = t.good;
 
           if (comp.status === 'danger') {
